@@ -3,15 +3,41 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 
 import {
   emptyThreadHint,
+  getMockRegeneratedReply,
+  getSharedConversationUrl,
   initialMessages,
+  linkCopiedToast,
   mockReplyChunks,
   type ChatMessage,
 } from '../fixtures/chat-lab'
 import { ChatComposer } from './ChatComposer'
 import { ChatSelectFooter } from './ChatSelectFooter'
 import { ChatSelectHeader } from './ChatSelectHeader'
+import { ChatShareFooter } from './ChatShareFooter'
 import { ChatThreadHeader } from './ChatThreadHeader'
+import { ChatToast } from './ChatToast'
 import { MessageBubble } from './MessageBubble'
+
+type SelectionIntent = 'delete' | 'share'
+const STREAM_CHARS_PER_FRAME = 0.6
+
+function countSelectedGroups(messages: ChatMessage[], selectedIds: string[]) {
+  const selected = new Set(selectedIds)
+  const seen = new Set<string>()
+  let count = 0
+
+  for (const message of messages) {
+    if (!selected.has(message.id) || seen.has(message.id)) {
+      continue
+    }
+    getMessagePairIds(messages, message.id).forEach((id) => {
+      seen.add(id)
+    })
+    count += 1
+  }
+
+  return count
+}
 
 function getMessagePairIds(messages: ChatMessage[], id: string) {
   const index = messages.findIndex((message) => message.id === id)
@@ -33,10 +59,11 @@ export function ChatThread() {
   const [messages, setMessages] = useState<ChatMessage[]>(initialMessages)
   const [draft, setDraft] = useState('')
   const [isRunning, setIsRunning] = useState(false)
-  const [isSelecting, setIsSelecting] = useState(false)
+  const [selectionIntent, setSelectionIntent] = useState<SelectionIntent | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
   const viewportRef = useRef<HTMLDivElement | null>(null)
-  const runRef = useRef<number | null>(null)
+  const runRef = useRef<{ cancel: () => void } | null>(null)
   const savedScrollTopRef = useRef(0)
   const shouldRestoreScrollRef = useRef(false)
 
@@ -50,23 +77,101 @@ export function ChatThread() {
 
   useEffect(() => {
     return () => {
-      if (runRef.current !== null) {
-        window.clearInterval(runRef.current)
-      }
+      runRef.current?.cancel()
     }
   }, [])
 
   const stopRun = () => {
-    if (runRef.current !== null) {
-      window.clearInterval(runRef.current)
-      runRef.current = null
-    }
+    runRef.current?.cancel()
+    runRef.current = null
     setIsRunning(false)
     setMessages((current) =>
       current.map((message) =>
         message.status === 'streaming' ? { ...message, status: 'complete' } : message,
       ),
     )
+  }
+
+  const streamAssistant = (assistantId: string, fullText: string) => {
+    runRef.current?.cancel()
+
+    setIsRunning(true)
+    setMessages((current) =>
+      current.map((message) => {
+        if (message.id === assistantId) {
+          const versions =
+            message.versions && message.versions.length > 0
+              ? message.versions
+              : message.content.trim()
+                ? [message.content]
+                : []
+          return {
+            ...message,
+            content: '',
+            status: 'streaming',
+            versions,
+            versionIndex: versions.length,
+          }
+        }
+        if (message.status === 'streaming') {
+          return { ...message, status: 'complete' }
+        }
+        return message
+      }),
+    )
+
+    let index = 0
+    let frameId = 0
+    let cancelled = false
+
+    const tick = () => {
+      if (cancelled) {
+        return
+      }
+
+      index = Math.min(fullText.length, index + STREAM_CHARS_PER_FRAME)
+      const finished = index >= fullText.length
+      const nextContent = fullText.slice(0, index)
+
+      setMessages((current) =>
+        current.map((message) => {
+          if (message.id !== assistantId) {
+            return message
+          }
+          if (!finished) {
+            return {
+              ...message,
+              content: nextContent,
+              status: 'streaming',
+            }
+          }
+          const versions = [...(message.versions ?? []), nextContent]
+          return {
+            ...message,
+            content: nextContent,
+            status: 'complete',
+            versions,
+            versionIndex: versions.length - 1,
+          }
+        }),
+      )
+
+      if (finished) {
+        runRef.current = null
+        setIsRunning(false)
+        return
+      }
+
+      frameId = window.requestAnimationFrame(tick)
+    }
+
+    frameId = window.requestAnimationFrame(tick)
+    runRef.current = {
+      cancel: () => {
+        cancelled = true
+        window.cancelAnimationFrame(frameId)
+      },
+    }
   }
 
   const sendMessage = () => {
@@ -90,49 +195,51 @@ export function ChatThread() {
     }
 
     setDraft('')
-    setIsRunning(true)
     setMessages((current) => [...current, userMessage, assistantMessage])
+    streamAssistant(assistantId, mockReplyChunks.join(''))
+  }
 
-    let chunkIndex = 0
-    runRef.current = window.setInterval(() => {
-      const chunk = mockReplyChunks[chunkIndex]
-      chunkIndex += 1
-      setMessages((current) =>
-        current.map((message) => {
-          if (message.id !== assistantId) {
-            return message
-          }
-          const nextContent = message.content ? `${message.content} ${chunk}` : chunk
-          const finished = chunkIndex >= mockReplyChunks.length
-          return {
-            ...message,
-            content: nextContent,
-            status: finished ? 'complete' : 'streaming',
-          }
-        }),
-      )
-      if (chunkIndex >= mockReplyChunks.length) {
-        if (runRef.current !== null) {
-          window.clearInterval(runRef.current)
-          runRef.current = null
+  const regenerateMessage = (messageId: string) => {
+    const message = messages.find((item) => item.id === messageId)
+    if (!message || message.role !== 'assistant') {
+      return
+    }
+
+    const generationCount = (message.versions?.length || (message.content.trim() ? 1 : 0)) + 1
+    streamAssistant(messageId, getMockRegeneratedReply(generationCount, message.content.trim()))
+  }
+
+  const selectGeneration = (messageId: string, index: number) => {
+    setMessages((current) =>
+      current.map((message) => {
+        if (message.id !== messageId || !message.versions?.length) {
+          return message
         }
-        setIsRunning(false)
-      }
-    }, 420)
+        const nextIndex = Math.max(0, Math.min(message.versions.length - 1, index))
+        return {
+          ...message,
+          versionIndex: nextIndex,
+          content: message.versions[nextIndex] ?? message.content,
+        }
+      }),
+    )
   }
 
   const lastUserMessageId = [...messages].reverse().find((message) => message.role === 'user')?.id
+  const lastMessageId = messages[messages.length - 1]?.id
 
-  const enterSelectMode = (messageId: string) => {
+  const isSelecting = selectionIntent !== null
+
+  const enterSelectMode = (messageId: string, intent: SelectionIntent) => {
     savedScrollTopRef.current = viewportRef.current?.scrollTop ?? 0
     shouldRestoreScrollRef.current = false
-    setIsSelecting(true)
+    setSelectionIntent(intent)
     setSelectedIds(getMessagePairIds(messages, messageId))
   }
 
   const exitSelectMode = (restoreScroll = false) => {
     shouldRestoreScrollRef.current = restoreScroll
-    setIsSelecting(false)
+    setSelectionIntent(null)
     setSelectedIds([])
   }
 
@@ -162,11 +269,33 @@ export function ChatThread() {
     })
   }
 
+  const toggleSelectAll = (nextSelected: boolean) => {
+    setSelectedIds(nextSelected ? messages.map((message) => message.id) : [])
+  }
+
   const deleteSelected = () => {
     const removing = new Set(selectedIds)
     setMessages((current) => current.filter((message) => !removing.has(message.id)))
     exitSelectMode()
   }
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getSharedConversationUrl())
+      exitSelectMode(true)
+      setToastMessage(linkCopiedToast)
+      window.setTimeout(() => setToastMessage(null), 3000)
+    } catch {
+      setToastMessage(null)
+    }
+  }
+
+  const selectAllState =
+    messages.length > 0 && selectedIds.length === messages.length
+      ? true
+      : selectedIds.length > 0
+        ? 'indeterminate'
+        : false
 
   return (
     <div className="flex h-full min-h-0 flex-col">
@@ -183,7 +312,7 @@ export function ChatThread() {
           <div
             className={cn(
               'mx-auto flex w-full max-w-[720px] flex-col',
-              isSelecting && 'gap-agentos-gap-gap-xs8',
+              isSelecting && (selectionIntent === 'share' ? 'gap-agentos-gap-gap16' : 'gap-agentos-gap-gap-xs8'),
             )}
           >
             {messages.map((message) => (
@@ -191,18 +320,33 @@ export function ChatThread() {
                 key={message.id}
                 message={message}
                 showEdit={message.role === 'user' && message.id === lastUserMessageId}
+                showRetry={message.role === 'assistant' && message.id === lastMessageId}
                 showShare={!isRunning}
                 selecting={isSelecting}
                 selected={selectedIds.includes(message.id)}
-                onDelete={() => enterSelectMode(message.id)}
+                highlightSelectedOnly={selectionIntent !== 'share'}
+                onDelete={() => enterSelectMode(message.id, 'delete')}
+                onShare={() => enterSelectMode(message.id, 'share')}
+                onRetry={() => regenerateMessage(message.id)}
+                onSelectGeneration={(index) => selectGeneration(message.id, index)}
                 onToggleSelect={(nextSelected) => setPairSelected(message.id, nextSelected)}
               />
             ))}
           </div>
         )}
       </div>
-      {isSelecting ? (
+      {selectionIntent === 'delete' ? (
         <ChatSelectFooter disabled={selectedIds.length === 0} onDelete={deleteSelected} />
+      ) : selectionIntent === 'share' ? (
+        <ChatShareFooter
+          selectAllState={selectAllState}
+          selectedGroupCount={countSelectedGroups(messages, selectedIds)}
+          copyDisabled={selectedIds.length === 0}
+          onToggleAll={toggleSelectAll}
+          onCopyLink={() => {
+            void copyShareLink()
+          }}
+        />
       ) : (
         <ChatComposer
           value={draft}
@@ -212,6 +356,9 @@ export function ChatThread() {
           onStop={stopRun}
         />
       )}
+      {toastMessage ? (
+        <ChatToast message={toastMessage} onClose={() => setToastMessage(null)} />
+      ) : null}
     </div>
   )
 }

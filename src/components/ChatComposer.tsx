@@ -1,8 +1,10 @@
-import { cn } from '@agentos/design-system'
-import { Paperclip, Send, Square } from 'lucide-react'
+import { Button, cn } from '@agentos/design-system'
+import { ArrowUp, ChevronDown, Image, Paperclip, Square } from 'lucide-react'
 import { useLayoutEffect, useRef } from 'react'
 
 import { composerPlaceholder } from '../fixtures/chat-lab'
+
+const MAX_TEXTAREA_HEIGHT = 200
 
 export function ChatComposer({
   value,
@@ -26,7 +28,7 @@ export function ChatComposer({
       return
     }
     textarea.style.height = 'auto'
-    textarea.style.height = `${textarea.scrollHeight}px`
+    textarea.style.height = `${Math.min(textarea.scrollHeight, MAX_TEXTAREA_HEIGHT)}px`
   }, [value])
 
   return (
@@ -41,7 +43,7 @@ export function ChatComposer({
           value={value}
           rows={1}
           placeholder={composerPlaceholder}
-          className="block min-h-[var(--agentos-font-leading-22)] w-full resize-none overflow-hidden border-0 bg-transparent text-agentos-md leading-agentos-22 text-agentos-neutral-text-color-text outline-none placeholder:text-agentos-neutral-text-color-text-placeholder"
+          className="composer-scrollview block max-h-[200px] min-h-[var(--agentos-font-leading-22)] w-full resize-none overflow-y-auto border-0 bg-transparent text-agentos-md leading-agentos-22 text-agentos-neutral-text-color-text outline-none placeholder:text-agentos-neutral-text-color-text-placeholder"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
             if (event.key === 'Enter' && !event.shiftKey) {
@@ -51,25 +53,41 @@ export function ChatComposer({
           }}
         />
         <div className="flex items-center justify-between">
-          <span className="rounded-agentos-rounded-lg8 border border-agentos-neutral-border-color-border px-2 py-1 text-agentos-sm text-agentos-neutral-text-color-text-secondary">
+          <Button
+            type="button"
+            theme="black"
+            appearance="ghost"
+            size="sm"
+            shape="rectangle"
+            trailingIcon={<ChevronDown aria-hidden="true" />}
+          >
             Auto
-          </span>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              aria-label="添加附件"
-              className="inline-flex size-7 items-center justify-center rounded-agentos-rounded-sm4 text-agentos-neutral-text-color-text-secondary transition hover:bg-agentos-neutral-fill-color-fill-tertiary hover:text-agentos-neutral-text-color-text"
-            >
-              <Paperclip className="size-4" />
-            </button>
+          </Button>
+          <div className="flex items-center gap-agentos-gap-gap-xs8">
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                aria-label="添加图片"
+                className="inline-flex size-agentos-control-control-height-sm24 items-center justify-center rounded-agentos-rounded-full999 text-agentos-brand-tertiary-color-tertiary transition hover:bg-agentos-brand-tertiary-color-tertiary-bg-hover"
+              >
+                <Image className="size-agentos-icon-icon-size-md16" />
+              </button>
+              <button
+                type="button"
+                aria-label="添加附件"
+                className="inline-flex size-agentos-control-control-height-sm24 items-center justify-center rounded-agentos-rounded-full999 text-agentos-brand-tertiary-color-tertiary transition hover:bg-agentos-brand-tertiary-color-tertiary-bg-hover"
+              >
+                <Paperclip className="size-agentos-icon-icon-size-md16" />
+              </button>
+            </div>
             {isRunning ? (
               <button
                 type="button"
                 aria-label="停止生成"
-                className="inline-flex size-7 items-center justify-center rounded-agentos-rounded-full999 bg-agentos-brand-tertiary-color-tertiary text-agentos-neutral-text-color-text-light-solid"
+                className="inline-flex size-agentos-control-control-height-sm24 items-center justify-center rounded-agentos-rounded-full999 bg-agentos-brand-tertiary-color-tertiary text-agentos-neutral-text-color-text-light-solid"
                 onClick={onStop}
               >
-                <Square className="size-4 fill-current" />
+                <Square className="size-agentos-icon-icon-size-md16 fill-current" />
               </button>
             ) : (
               <button
@@ -77,13 +95,13 @@ export function ChatComposer({
                 aria-label="发送"
                 disabled={!canSend}
                 className={cn(
-                  'inline-flex size-7 items-center justify-center rounded-agentos-rounded-lg8',
+                  'inline-flex size-agentos-control-control-height-sm24 items-center justify-center rounded-agentos-rounded-full999',
                   'bg-agentos-brand-tertiary-color-tertiary text-agentos-neutral-text-color-text-light-solid',
-                  'disabled:cursor-not-allowed disabled:opacity-40',
+                  'disabled:cursor-not-allowed disabled:bg-agentos-neutral-bg-color-bg-button-container-disabled-black disabled:text-agentos-neutral-text-color-text-disabled disabled:opacity-100',
                 )}
                 onClick={onSend}
               >
-                <Send className="size-4" />
+                <ArrowUp className="size-agentos-icon-icon-size-md16" />
               </button>
             )}
           </div>

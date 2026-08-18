@@ -22,3 +22,22 @@ body {
   font-size: var(--agentos-font-size-md);
   line-height: var(--agentos-font-leading-22);
 }
+
+.composer-scrollview {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(217, 220, 225, 1) transparent;
+}
+
+.composer-scrollview::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.composer-scrollview::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.composer-scrollview::-webkit-scrollbar-thumb {
+  background-color: rgba(217, 220, 225, 1);
+  border-radius: 6px;
+}

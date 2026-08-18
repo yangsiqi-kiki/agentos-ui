@@ -116,6 +116,7 @@ const IconActionButton = forwardRef<
         aria-label={label}
         className={cn(
           'size-agentos-control-control-height-sm24 [&_svg]:size-agentos-icon-icon-size-sm12',
+          'focus-visible:ring-0 focus-visible:ring-offset-0',
           className,
         )}
         {...props}
@@ -311,7 +312,10 @@ function MessageActions({
               <Ellipsis aria-hidden="true" />
             </IconActionButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align={align}>
+          <DropdownMenuContent
+            align={align}
+            onCloseAutoFocus={(event) => event.preventDefault()}
+          >
             <DropdownMenuItem
               className="text-agentos-brand-error-color-error"
               onSelect={onDelete}

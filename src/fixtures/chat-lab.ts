@@ -148,7 +148,7 @@ export type ConversationTab = {
 
 export const conversationTabs: ConversationTab[] = [
   { value: 'task-1', label: '智能体运行问题分析', closable: true },
-  { value: 'new-task', label: '新任务' },
+  { value: 'new-task', label: '新任务', closable: true },
 ]
 
 export const selectConversationTitle = '选择对话'

@@ -77,7 +77,9 @@ DropdownMenuSubContent.displayName =
   DropdownMenuPrimitive.SubContent.displayName
 
 export interface DropdownMenuContentProps
-  extends ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {}
+  extends ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Content> {
+  onOpenAutoFocus?: (event: Event) => void
+}
 
 const DropdownMenuContent = forwardRef<
   ElementRef<typeof DropdownMenuPrimitive.Content>,

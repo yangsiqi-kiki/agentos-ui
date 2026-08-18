@@ -169,12 +169,6 @@ function MessageActions({
   }
 
   useEffect(() => {
-    if (retryOpen) {
-      retryInputRef.current?.focus()
-    }
-  }, [retryOpen])
-
-  useEffect(() => {
     return () => {
       if (copiedTimerRef.current !== null) {
         window.clearTimeout(copiedTimerRef.current)
@@ -267,6 +261,12 @@ function MessageActions({
             <DropdownMenuContent
               align="start"
               className="w-[200px] min-w-[200px] p-0 py-agentos-padding-padding-xxs4 shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
+              onOpenAutoFocus={(event) => {
+                event.preventDefault()
+                requestAnimationFrame(() => {
+                  retryInputRef.current?.focus()
+                })
+              }}
               onCloseAutoFocus={(event) => event.preventDefault()}
             >
               <div className="flex items-center gap-agentos-gap-gap-xs8 px-agentos-padding-padding-sm12 py-[7px]">

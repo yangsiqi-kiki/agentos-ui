@@ -6,6 +6,7 @@ import { defineConfig } from 'vite'
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 
 export default defineConfig({
+  base: process.env.BASE_PATH || '/',
   plugins: [react()],
   resolve: {
     alias: {

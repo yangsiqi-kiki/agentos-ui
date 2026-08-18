@@ -172,10 +172,15 @@ export const sharedConversationTitle = '框架协议验收与付款条款梳理'
 export const sharedConversationDate = '2026 年 8 月 18 日'
 export const sharedConversationDisclaimer = '内容由 AI 生成，不能完全保障真实'
 
+function withBasePath(pathname: string) {
+  const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+  return `${base}${pathname}`
+}
+
 export function getSharedConversationUrl(origin = window.location.origin) {
-  return `${origin}${sharedConversationPath}`
+  return `${origin}${withBasePath(sharedConversationPath)}`
 }
 
 export function isSharedConversationPath(pathname: string) {
-  return pathname === sharedConversationPath
+  return pathname === sharedConversationPath || pathname === withBasePath(sharedConversationPath)
 }

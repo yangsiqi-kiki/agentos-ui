@@ -1,5 +1,5 @@
 import { Button, cn } from '@agentos/design-system'
-import { ArrowUp, ChevronDown, Image, Paperclip, Square } from 'lucide-react'
+import { ArrowUp, ChevronDown, Image, Paperclip } from 'lucide-react'
 import { useLayoutEffect, useRef } from 'react'
 
 import { composerPlaceholder } from '../fixtures/chat-lab'
@@ -87,7 +87,7 @@ export function ChatComposer({
                 className="inline-flex size-agentos-control-control-height-sm24 items-center justify-center rounded-agentos-rounded-full999 bg-agentos-brand-tertiary-color-tertiary text-agentos-neutral-text-color-text-light-solid"
                 onClick={onStop}
               >
-                <Square className="size-agentos-icon-icon-size-md16 fill-current" />
+                <span className="size-2 rounded-[2px] bg-current" />
               </button>
             ) : (
               <button

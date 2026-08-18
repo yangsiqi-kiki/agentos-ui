@@ -199,14 +199,17 @@ export function ChatThread() {
     streamAssistant(assistantId, mockReplyChunks.join(''))
   }
 
-  const regenerateMessage = (messageId: string) => {
+  const regenerateMessage = (messageId: string, prompt?: string) => {
     const message = messages.find((item) => item.id === messageId)
     if (!message || message.role !== 'assistant') {
       return
     }
 
     const generationCount = (message.versions?.length || (message.content.trim() ? 1 : 0)) + 1
-    streamAssistant(messageId, getMockRegeneratedReply(generationCount, message.content.trim()))
+    streamAssistant(
+      messageId,
+      getMockRegeneratedReply(generationCount, message.content.trim(), prompt),
+    )
   }
 
   const selectGeneration = (messageId: string, index: number) => {
@@ -327,7 +330,7 @@ export function ChatThread() {
                 highlightSelectedOnly={selectionIntent !== 'share'}
                 onDelete={() => enterSelectMode(message.id, 'delete')}
                 onShare={() => enterSelectMode(message.id, 'share')}
-                onRetry={() => regenerateMessage(message.id)}
+                onRetry={(prompt?: string) => regenerateMessage(message.id, prompt)}
                 onSelectGeneration={(index) => selectGeneration(message.id, index)}
                 onToggleSelect={(nextSelected) => setPairSelected(message.id, nextSelected)}
               />
@@ -336,7 +339,13 @@ export function ChatThread() {
         )}
       </div>
       {selectionIntent === 'delete' ? (
-        <ChatSelectFooter disabled={selectedIds.length === 0} onDelete={deleteSelected} />
+        <ChatSelectFooter
+          selectAllState={selectAllState}
+          selectedGroupCount={countSelectedGroups(messages, selectedIds)}
+          disabled={selectedIds.length === 0}
+          onToggleAll={toggleSelectAll}
+          onDelete={deleteSelected}
+        />
       ) : selectionIntent === 'share' ? (
         <ChatShareFooter
           selectAllState={selectAllState}

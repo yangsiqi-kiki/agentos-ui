@@ -109,9 +109,21 @@ const mockRegenerateVariants = [
   '按风险优先级重排了一版，方便直接给业务和法务看。\n\n**高**\n- 默示验收：协议写成逾期视为通过，模板要求书面结论\n- 滞纳金：协议有日万分之五且上限 10%，模板未约定\n\n**中**\n- 验收时限 10 个工作日，模板是 5 个工作日\n- 复验轮次限定两轮，模板只写合理期限\n\n**低**\n- 付款比例一致；质保金支付时限可保留，补齐模板空白\n\n要我按这个优先级出一版修订对照表吗？',
 ]
 
-export function getMockRegeneratedReply(generationCount: number, fallback = mockReplyChunks.join('')) {
-  return mockRegenerateVariants[(generationCount - 1) % mockRegenerateVariants.length] ?? fallback
+export function getMockRegeneratedReply(
+  generationCount: number,
+  fallback = mockReplyChunks.join(''),
+  prompt?: string,
+) {
+  const body = mockRegenerateVariants[(generationCount - 1) % mockRegenerateVariants.length] ?? fallback
+  const direction = prompt?.trim()
+  if (!direction) {
+    return body
+  }
+  return `按你的要求「${direction}」重新整理如下。\n\n${body}`
 }
+
+export const regenerateLabel = '重新生成'
+export const regeneratePromptPlaceholder = '输入更改回复的要求'
 
 export const resourceItems = [
   { key: 'ontology', label: '本体' },

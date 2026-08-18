@@ -1,5 +1,6 @@
-import { Avatar, Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tag, cn } from '@agentos/design-system'
+import { Avatar, Button, Checkbox, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, Tag, cn } from '@agentos/design-system'
 import {
+  ArrowUp,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -11,37 +12,117 @@ import {
   Trash2,
 } from 'lucide-react'
 import { forwardRef, useEffect, useRef, useState, type ComponentPropsWithoutRef, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
-import { agentInitial, agentName, agentTag, type ChatMessage } from '../fixtures/chat-lab'
+import {
+  agentInitial,
+  agentName,
+  agentTag,
+  regenerateLabel,
+  regeneratePromptPlaceholder,
+  type ChatMessage,
+} from '../fixtures/chat-lab'
 import { MarkdownContent } from './MarkdownContent'
 
 const streamingTailFadeClassName =
   '[mask-image:linear-gradient(#000,#000),linear-gradient(to_right,#000_calc(100%-64px),transparent)] [mask-position:0_0,bottom] [mask-size:100%_calc(100%-1.5em),100%_1.5em] [mask-repeat:no-repeat] [-webkit-mask-image:linear-gradient(#000,#000),linear-gradient(to_right,#000_calc(100%-64px),transparent)] [-webkit-mask-position:0_0,bottom] [-webkit-mask-size:100%_calc(100%-1.5em),100%_1.5em] [-webkit-mask-repeat:no-repeat]'
 
+function ActionTooltip({
+  label,
+  disabled = false,
+  children,
+}: {
+  label: string
+  disabled?: boolean
+  children: ReactNode
+}) {
+  const triggerRef = useRef<HTMLSpanElement | null>(null)
+  const [open, setOpen] = useState(false)
+  const [position, setPosition] = useState({ top: 0, left: 0 })
+
+  const updatePosition = () => {
+    const rect = triggerRef.current?.getBoundingClientRect()
+    if (!rect) {
+      return
+    }
+    setPosition({ top: rect.bottom + 4, left: rect.left + rect.width / 2 })
+  }
+
+  const show = open && !disabled
+
+  useEffect(() => {
+    if (!show) {
+      return
+    }
+    const hide = () => setOpen(false)
+    window.addEventListener('scroll', hide, true)
+    window.addEventListener('resize', hide)
+    return () => {
+      window.removeEventListener('scroll', hide, true)
+      window.removeEventListener('resize', hide)
+    }
+  }, [show])
+
+  return (
+    <span
+      ref={triggerRef}
+      className="relative inline-flex"
+      onMouseEnter={() => {
+        if (disabled) {
+          return
+        }
+        updatePosition()
+        setOpen(true)
+      }}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {children}
+      {show
+        ? createPortal(
+            <span
+              role="tooltip"
+              className="pointer-events-none fixed z-[40] flex -translate-x-1/2 flex-col items-center"
+              style={{ top: position.top, left: position.left }}
+            >
+              <span className="h-0 w-0 border-x-[5px] border-b-[4px] border-x-transparent border-b-agentos-neutral-bg-color-bg-spotlight" />
+              <span className="whitespace-nowrap rounded-agentos-rounded-lg8 bg-agentos-neutral-bg-color-bg-spotlight px-agentos-padding-padding-sm12 py-agentos-padding-padding-xxs4 text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text-light-solid">
+                {label}
+              </span>
+            </span>,
+            document.body,
+          )
+        : null}
+    </span>
+  )
+}
+
 const IconActionButton = forwardRef<
   HTMLButtonElement,
   {
     label: string
+    tooltipDisabled?: boolean
     children: ReactNode
   } & ComponentPropsWithoutRef<'button'>
->(function IconActionButton({ label, children, className, ...props }, ref) {
+>(function IconActionButton({ label, tooltipDisabled = false, children, className, ...props }, ref) {
   return (
-    <Button
-      ref={ref}
-      type="button"
-      theme="black"
-      appearance="ghost"
-      size="icon"
-      shape="rectangle"
-      aria-label={label}
-      className={cn(
-        'size-agentos-control-control-height-sm24 [&_svg]:size-agentos-icon-icon-size-sm12',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </Button>
+    <ActionTooltip label={label} disabled={tooltipDisabled || props.disabled === true}>
+      <Button
+        ref={ref}
+        type="button"
+        theme="black"
+        appearance="ghost"
+        size="icon"
+        shape="rectangle"
+        aria-label={label}
+        className={cn(
+          'size-agentos-control-control-height-sm24 [&_svg]:size-agentos-icon-icon-size-sm12',
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </Button>
+    </ActionTooltip>
   )
 })
 
@@ -65,7 +146,7 @@ function MessageActions({
   revealOnHover?: boolean
   onDelete?: () => void
   onShare?: () => void
-  onRetry?: () => void
+  onRetry?: (prompt?: string) => void
   generation?: {
     current: number
     total: number
@@ -74,7 +155,17 @@ function MessageActions({
   }
 }) {
   const [copied, setCopied] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [retryOpen, setRetryOpen] = useState(false)
+  const [retryPrompt, setRetryPrompt] = useState('')
   const copiedTimerRef = useRef<number | null>(null)
+  const retryInputRef = useRef<HTMLInputElement | null>(null)
+
+  const submitRetry = (prompt?: string) => {
+    setRetryOpen(false)
+    setRetryPrompt('')
+    onRetry?.(prompt)
+  }
 
   useEffect(() => {
     return () => {
@@ -147,23 +238,82 @@ function MessageActions({
           </IconActionButton>
         ) : null}
         {showEdit ? (
-          <IconActionButton label="编辑">
+          <IconActionButton label="修改">
             <Pencil aria-hidden="true" />
           </IconActionButton>
         ) : null}
         {showRetry ? (
-          <IconActionButton label="重新生成" onClick={onRetry}>
-            <RefreshCw aria-hidden="true" />
-          </IconActionButton>
+          <DropdownMenu
+            open={retryOpen}
+            onOpenChange={(open) => {
+              setRetryOpen(open)
+              if (!open) {
+                setRetryPrompt('')
+              }
+            }}
+          >
+            <DropdownMenuTrigger asChild>
+              <IconActionButton label={regenerateLabel} tooltipDisabled={retryOpen}>
+                <RefreshCw aria-hidden="true" />
+              </IconActionButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              className="w-[200px] min-w-[200px] p-0 py-agentos-padding-padding-xxs4 shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
+              onOpenAutoFocus={(event) => {
+                event.preventDefault()
+                retryInputRef.current?.focus()
+              }}
+              onCloseAutoFocus={(event) => event.preventDefault()}
+            >
+              <div className="flex items-center gap-agentos-gap-gap-xs8 px-agentos-padding-padding-sm12 py-[7px]">
+                <input
+                  ref={retryInputRef}
+                  value={retryPrompt}
+                  placeholder={regeneratePromptPlaceholder}
+                  className="min-w-0 flex-1 bg-transparent text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text outline-none placeholder:text-agentos-neutral-text-color-text-placeholder"
+                  onChange={(event) => setRetryPrompt(event.target.value)}
+                  onKeyDown={(event) => {
+                    event.stopPropagation()
+                    if (event.key === 'Enter' && retryPrompt.trim()) {
+                      event.preventDefault()
+                      submitRetry(retryPrompt.trim())
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  aria-label="按要求重新生成"
+                  disabled={!retryPrompt.trim()}
+                  className={cn(
+                    'inline-flex size-agentos-control-control-height-sm24 shrink-0 items-center justify-center rounded-agentos-rounded-full999',
+                    'bg-agentos-brand-tertiary-color-tertiary text-agentos-neutral-text-color-text-light-solid',
+                    'disabled:cursor-not-allowed disabled:bg-agentos-neutral-bg-color-bg-button-container-disabled-black disabled:text-agentos-neutral-text-color-text-disabled',
+                  )}
+                  onClick={() => submitRetry(retryPrompt.trim())}
+                >
+                  <ArrowUp className="size-agentos-icon-icon-size-sm12" />
+                </button>
+              </div>
+              <DropdownMenuSeparator className="my-0" />
+              <DropdownMenuItem onSelect={() => submitRetry()}>
+                <RefreshCw aria-hidden="true" />
+                {regenerateLabel}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : null}
-        <DropdownMenu>
+        <DropdownMenu onOpenChange={setMoreOpen}>
           <DropdownMenuTrigger asChild>
-            <IconActionButton label="更多">
+            <IconActionButton label="更多" tooltipDisabled={moreOpen}>
               <Ellipsis aria-hidden="true" />
             </IconActionButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent align={align}>
-            <DropdownMenuItem onSelect={onDelete}>
+            <DropdownMenuItem
+              className="text-agentos-brand-error-color-error"
+              onSelect={onDelete}
+            >
               <Trash2 aria-hidden="true" />
               删除
             </DropdownMenuItem>
@@ -234,7 +384,7 @@ export function MessageBubble({
   showActions?: boolean
   onDelete?: () => void
   onShare?: () => void
-  onRetry?: () => void
+  onRetry?: (prompt?: string) => void
   onSelectGeneration?: (index: number) => void
   onToggleSelect?: (nextSelected: boolean) => void
 }) {

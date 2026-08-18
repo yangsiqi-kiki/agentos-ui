@@ -1,0 +1,24 @@
+@import '@agentos/design-system/styles/tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  font-family: var(--agentos-font-family-cn), var(--agentos-font-family-en), system-ui, sans-serif;
+  color: var(--agentos-neutral-text-color-text);
+  background: var(--agentos-neutral-bg-color-bg-layout);
+}
+
+body {
+  font-size: var(--agentos-font-size-md);
+  line-height: var(--agentos-font-leading-22);
+}

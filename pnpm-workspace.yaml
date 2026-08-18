@@ -1,2 +1,5 @@
+packages:
+  - packages/@agentos/*
+
 allowBuilds:
   esbuild: true

@@ -1,0 +1,139 @@
+import { Meta } from '@storybook/blocks'
+import { DocHeader, DocTable } from './_layout'
+
+<Meta title="Overview/用法" />
+
+<DocHeader
+  eyebrow="Getting started"
+  title="用法"
+  description="非开发人员如何阅读本说明书；开发人员如何接入本包。"
+/>
+
+## 非开发人员：如何使用本说明书
+
+### 浏览组件
+
+1. 左侧边栏按 **Overview → Tokens → Atoms → Molecules → Organisms → Pages** 组织；简介与用法位于 Overview 下。
+2. 点击任一组件（如 Button），进入文档页，可看到：
+   - 中文名、描述、分类与 Figma 链接
+   - 交互示例（可直接点击试玩）
+   - Props 表格（控件区可切换 variant）
+   - 相关 Color / Font token
+3. 页面右侧 **目录** 可快速跳转到「概述 / 示例 / Props」等章节。
+
+### 查看与复制 Token
+
+1. 打开 **Tokens / Color** 或 **Tokens / Typography**。
+2. 点击色块可复制对应 CSS 变量（如 `--agentos-brand-primary-color-primary`）。
+3. 组件文档底部的「相关 Token」也可点击复制。
+
+### 对照设计稿
+
+每个组件文档头部的「在 Figma 中查看设计稿」会打开该组件在 AgentOS Design System 文件中的节点。设计师请优先使用 Figma Variables 路径（见 DESIGN.md 对照表）。
+
+---
+
+## 开发人员：如何接入
+
+### 安装
+
+本包通过 monorepo `workspace:*` 引入，宿主（如 `apps/web`）在 `package.json` 中声明：
+
+```json
+{
+  "dependencies": {
+    "@agentos/design-system": "workspace:*"
+  }
+}
+```
+
+### 样式基座
+
+在应用入口引入 token CSS，并在 Tailwind 配置使用 preset：
+
+```ts
+// main.tsx / 全局样式入口
+import '@agentos/design-system/styles/tokens.css'
+```
+
+```ts
+// tailwind.config.ts
+import type { Config } from 'tailwindcss'
+import agentosPreset from '@agentos/design-system/tailwind-preset'
+
+export default {
+  presets: [agentosPreset],
+  content: ['./src/**/*.{ts,tsx}'],
+} satisfies Config
+```
+
+preset 已自带 content 扩展点、plugins 与 darkMode 配置，宿主无需重复声明。
+
+### 使用组件
+
+```tsx
+import { Button } from '@agentos/design-system'
+
+export function Example() {
+  return (
+    <Button theme="primary" appearance="solid">
+      确认
+    </Button>
+  )
+}
+```
+
+公共 API 经包内 `src/index.ts` barrel 导出。
+
+### 组件落位与实现约定
+
+<DocTable
+  columns={['约定', '说明']}
+  rows={[
+    [
+      '分层目录',
+      <>
+        <code>atoms</code> / <code>molecules</code> / <code>organisms</code> /{' '}
+        <code>layouts</code> / <code>pages</code>
+      </>,
+    ],
+    [
+      '变体',
+      <>
+        使用 <code>cva</code> 管理 variant
+      </>,
+    ],
+    [
+      '引用',
+      <>
+        <code>forwardRef</code> + 显式 props
+      </>,
+    ],
+    [
+      '颜色',
+      <>
+        只用 <code>--agentos-*</code> / <code>agentos</code> Tailwind class
+      </>,
+    ],
+    [
+      '图标',
+      <>
+        默认 <code>lucide-react</code>；禁止手写内联 SVG 充当图标
+      </>,
+    ],
+  ]}
+/>
+
+本地预览本说明书：
+
+```bash
+pnpm --filter @agentos/design-system storybook
+```
+
+---
+
+## 设计契约 DESIGN.md
+
+`DESIGN.md` 是对外设计契约（Figma Variables ↔ CSS ↔ Tailwind）。完整说明、下载包与在外部项目中的使用方式见：
+
+**[设计契约 DESIGN.md](?path=/docs/overview-设计契约--docs)**

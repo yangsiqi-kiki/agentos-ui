@@ -1,0 +1,295 @@
+import { Meta } from '@storybook/blocks'
+import { DocHeader, DocTable } from './_layout'
+
+<Meta title="Overview/贡献组件" />
+
+<DocHeader
+  eyebrow="AI-assisted contributing"
+  title="使用 AI Agent 贡献组件"
+  description="向 AI Agent 提供 Figma 设计与组件需求，由 Agent 按仓库规则完成实现、Storybook 文档和校验。"
+/>
+
+## 适用场景
+
+当你需要从 Figma 新增组件、调整已有组件，或为组件补齐 Storybook 时，优先让
+AI Agent 执行完整流程。你负责提供设计与需求、确认结果；Agent 负责读取规则、
+调用 Figma MCP、修改代码并完成校验。
+
+## 前置条件
+
+<DocTable
+  columns={['检查项', '要求']}
+  rows={[
+    [
+      '工作区',
+      <>
+        在 Cursor 中打开仓库根目录，并确认目标包为{' '}
+        <code>packages/@agentos/design-system</code>
+      </>,
+    ],
+    [
+      'Figma 权限',
+      '当前账号能够访问目标设计文件，链接应指向具体组件或组件集节点',
+    ],
+    [
+      'Figma MCP',
+      <>
+        Cursor 已连接 Figma MCP，Agent 可以调用{' '}
+        <code>get_design_context</code>、<code>get_screenshot</code> 和{' '}
+        <code>get_variable_defs</code>
+      </>,
+    ],
+    [
+      'Agent Skill',
+      <>
+        仓库内存在 <code>.agents/skills/component-creator/SKILL.md</code>
+      </>,
+    ],
+    [
+      '需求信息',
+      '至少提供 Figma 链接、组件用途和需要覆盖的状态；组件层级不确定时可交给 Agent 判断',
+    ],
+  ]}
+/>
+
+如果 Figma MCP 未连接、设计文件无访问权限或链接没有定位到具体节点，Agent
+无法可靠读取设计，应先解决对应问题，不要让 Agent 根据截图或描述猜测 token。
+
+## 发给 Agent 的提示词
+
+在 Cursor Agent 对话中粘贴以下 Markdown 模板，删除不适用的项目并替换
+`<...>` 占位内容。描述越完整，Agent 越容易一次完成正确实现。
+
+```markdown
+# Design System 组件任务
+
+请调用 `.agents/skills/component-creator/SKILL.md` 完成此任务，并严格执行
+`/design-system/AGENTS.md` 中的规则。
+
+## 任务信息
+
+- 变更类型：<新增组件 / 修改已有组件 / 补齐 Storybook>
+- Figma 链接：<包含 node-id 的组件或组件集链接>
+- 组件名称：<英文组件名；不确定时请根据设计和职责判断>
+- 期望层级：<atoms / molecules / organisms / layouts / pages；不确定可留空>
+
+## 组件描述
+
+### 组件作用
+
+<这个组件解决什么问题、向用户表达什么信息或提供什么能力>
+
+### 使用场景
+
+- <主要使用场景>
+- <次要使用场景>
+- <不应该使用该组件的场景>
+
+### 对外交互 Actions
+
+- `<Action 或回调名称>`：<触发条件、参数和预期结果>
+- `<Action 或回调名称>`：<触发条件、参数和预期结果>
+- 键盘交互：<Enter / Escape / 方向键 / Tab 等行为>
+- 焦点行为：<初始焦点、焦点移动与关闭后的焦点恢复>
+
+### 状态与变体
+// 有作图软件的mcp功能可以不需要考虑，mcp能够读取到设计图的表达，如有偏差，再做调整
+- 尺寸：<例如 sm / default / lg>
+- 视觉变体：<例如 primary / secondary / danger>
+- 交互状态：<例如 default / hover / active / focus / disabled / loading>
+- 内容状态：<例如 empty / overflow / error / success>
+
+### 特殊场景
+
+- <超长文本、空数据、极端数值等边界情况>
+- <异步加载、请求失败、重复点击等异常情况>
+- <移动端、窄容器或响应式行为>
+- <无障碍要求，例如 aria-label、读屏顺序或键盘操作>
+- <其他 Figma 无法表达但实现必须遵守的业务规则>
+
+### 对外 API
+
+- 必需 props：<名称、类型与用途>
+- 可选 props：<名称、类型、默认值与用途>
+- 受控/非受控：<value/defaultValue、open/defaultOpen 等约定>
+- 文案覆盖：<label、placeholder、aria-label、空态等可覆盖文案>
+
+## 实现要求
+
+1. 通过 Figma MCP 获取 design context、截图和变量定义，不要根据截图猜测 token。
+2. 对照 `DESIGN.md` 和 `docs/token-reference.md` 完成 Figma Variables 到
+   AgentOS token 的映射，禁止硬编码色值。
+3. 优先复用现有组件；图标使用 Lucide 或 Tabler，禁止手写内联 SVG。
+4. 补齐组件实现、barrel 导出、CSF story、中文 MDX 和组件元数据。
+5. Storybook 覆盖主要变体、Actions、特殊场景、边界状态和键盘交互。
+6. 所有默认文案使用英文且可通过 props 覆盖，不在组件库中引入 i18n 运行时。
+7. 保留工作区中与本任务无关的已有改动。
+
+## 验收标准
+
+- <视觉和 Figma 一致的具体要求>
+- <交互与 Actions 的预期行为>
+- <必须在 Storybook 中展示的状态或场景>
+- lint、typecheck 和 Storybook 构建通过
+
+信息不足且会影响组件 API、交互或视觉实现时，请先向我提问确认；其余内容按
+skill 和仓库现有模式直接实现。完成后汇报改动文件、复用组件、token 映射、
+校验结果及仍需人工确认的差异。
+```
+
+若设计中包含复杂交互、响应式行为或 Figma 未表达的业务规则，请在提示词中补充
+验收标准。信息不足且会显著影响实现时，Agent 应先提问确认。
+
+## AI Agent 操作步骤
+
+<DocTable
+  columns={['步骤', '你需要做什么', 'Agent 会做什么']}
+  rows={[
+    [
+      '1. 提交需求',
+      '发送提示词、Figma 链接与验收范围',
+      '识别任务是新增、变更还是补文档',
+    ],
+    [
+      '2. 读取约束',
+      '无需手动转述仓库规范',
+      <>
+        读取 <code>AGENTS.md</code>、<code>component-creator</code> skill、
+        <code>DESIGN.md</code> 与现有相似组件
+      </>,
+    ],
+    [
+      '3. 读取设计',
+      '确保链接和节点可访问',
+      <>
+        调用 Figma MCP 获取设计上下文、截图、变量定义与图标子节点信息
+      </>,
+    ],
+    [
+      '4. 确认方案',
+      '回答 Agent 提出的必要问题',
+      '判断组件层级、复用边界、props、变体、token 与图标映射',
+    ],
+    [
+      '5. 实现组件',
+      '等待 Agent 完成修改',
+      <>
+        复用已有 atoms，按需实现到{' '}
+        <code>src/components/&lt;level&gt;/</code> 并更新 barrel
+      </>,
+    ],
+    [
+      '6. 补齐说明书',
+      '确认示例覆盖了主要使用场景',
+      <>
+        生成 story、中文 MDX，并登记 <code>component-meta</code>
+      </>,
+    ],
+    [
+      '7. 自动校验',
+      '无需手动执行命令',
+      '运行 lint、typecheck 和 Storybook 构建，修复本次引入的问题',
+    ],
+    [
+      '8. 验收结果',
+      '在 Storybook 对照 Figma 检查视觉与交互',
+      '汇报改动文件、复用项、token 映射、校验结果和待人工确认项',
+    ],
+  ]}
+/>
+
+## Agent 如何使用 Figma MCP
+
+<DocTable
+  columns={['工具', '用途']}
+  rows={[
+    [
+      <code>get_design_context</code>,
+      '主入口：读取节点结构、参考代码与设计上下文',
+    ],
+    [<code>get_screenshot</code>, '获取视觉基准，用于实现后对照'],
+    [<code>get_variable_defs</code>, '读取节点绑定的 Figma Variables'],
+    [
+      <code>get_metadata</code>,
+      '识别图标等子节点的组件实例名与层级信息',
+    ],
+  ]}
+/>
+
+这些工具由 Agent 调用，你不需要手动解析参数。Agent 会从 Figma URL 读取
+`fileKey` 与 `nodeId`，并将 URL 中的 `node-id=1-2` 转换为 MCP 使用的
+`1:2`。变量定义返回的 Figma 路径须与 `DESIGN.md` 或
+`docs/token-reference.md` 对齐，再转换为对应的语义 Tailwind class。
+
+## Agent 如何判断组件层级
+
+<DocTable
+  columns={['层级', '目录', '判断方式', '示例']}
+  rows={[
+    ['Atom', 'atoms', '最小可复用交互或展示单元', 'Button、Input、Tag'],
+    ['Molecule', 'molecules', '由多个 atoms 组成的完整小功能', 'FormItem、Modal'],
+    ['Organism', 'organisms', '可独立承担页面功能的区块', 'PageHeader'],
+    ['Layout', 'layouts', '组织页面区域但不承载业务内容', 'LayoutHeaderContainer'],
+    ['Page', 'pages', '完整页面组合或场景示例', 'KnowledgeRetrievalPage'],
+  ]}
+/>
+
+## Agent 必须遵守的实现约定
+
+### Token 与样式
+
+- 优先使用语义 token，不直接使用 Base 色阶表达业务语义。
+- 颜色、字号、间距和圆角均使用 `agentos` token class。
+- 使用 `cva` 管理 variant，使用 `cn()` 合并 `className`。
+- 组件使用 `forwardRef` 与显式 props，并保持单文件单组件。
+
+### 图标
+
+- 默认使用 `lucide-react`，Lucide 无对应图标或设计明确为 Tabler 时使用
+  `@tabler/icons-react`。
+- 禁止手写内联 SVG 或用 `<img>` 充当图标。
+- 图标尺寸由容器 class 控制，颜色通过 `currentColor` 继承。
+- 装饰性图标添加 `aria-hidden="true"`；可交互图标所在按钮提供
+  `aria-label`。
+
+### 文案
+
+- 组件默认文案使用英文，便于宿主覆盖和回退。
+- label、placeholder、`aria-label`、title、空态等用户可见文案必须通过
+  props 覆盖。
+- 组件库不内置 i18n 运行时，本地化文案由宿主传入。
+
+## Agent 必须补齐的 Storybook 内容
+
+每个新增组件需要在同名 PascalCase 文件夹内同步提供以下三部分：
+
+1. `stories/<ComponentName>/<ComponentName>.stories.tsx`：使用 CSF 定义变体、状态与交互示例；引用组件源码用 `../../../src/...`。
+2. `stories/<ComponentName>/<ComponentName>.mdx`：使用 `ComponentMeta`、`Controls` 和
+   `TokenUsage` 编写中文说明书；引用共享布局用 `../docs/_layout`；Atoms、Molecules、Organisms 使用 `Canvas`
+   展示示例，Layouts、Pages 使用 `StoryLink` 链接到独立 story。
+3. `docs/component-meta.anti-pattern.ts`：登记中文名、描述、分类、Figma
+   链接和常用 token。
+
+Story 的 `title` 按组件层级命名，例如 `Atoms/Button`。可枚举 props 使用
+`argTypes` 和 `select` 控件；除单一状态 story 外，应提供一个聚合 story
+集中展示主要变体。MDX 使用 `<Meta of={Stories} />` 关联 story，不再添加
+`tags: ['autodocs']`。Layouts 与 Pages 不在 Docs 中内嵌全幅界面，避免受到
+Docs 容器宽度限制而变形。
+
+## Agent 必须执行的校验
+
+```bash
+pnpm --filter @agentos/design-system lint
+pnpm --filter @agentos/design-system typecheck
+pnpm --filter @agentos/design-system storybook
+```
+
+## 你的验收清单
+
+- Storybook 中的视觉结果与 Figma 一致
+- 主要尺寸、状态、变体与交互都可在 story 中查看
+- 组件 API 符合实际使用场景，没有写死业务文案
+- MDX 包含概述、示例、用法、Props 与相关 Token
+- Agent 已汇报 Figma 变量到 AgentOS token 的映射
+- lint、typecheck 和 Storybook 构建均已通过
+- Agent 已明确列出图标、交互或响应式等仍需人工确认的差异

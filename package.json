@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@agentos/design-system": "file:../agentos_studio_frontend/packages/@agentos/design-system",
+    "@agentos/design-system": "workspace:*",
     "@tabler/icons-react": "^3.46.0",
     "lucide-react": "^0.577.0",
     "react": "^19.2.4",

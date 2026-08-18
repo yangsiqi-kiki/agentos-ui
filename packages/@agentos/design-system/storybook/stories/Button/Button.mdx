@@ -1,0 +1,71 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as ButtonStories from './Button.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={ButtonStories} />
+
+<ComponentMeta id="button" />
+
+## 概述
+
+按钮用于触发操作或导航，覆盖主次交互场景。通过 `theme`（primary / secondary / black / danger）与 `appearance`（solid / outline / ghost）组合表达语义强度；`shape` 支持直角圆角（rectangle）与胶囊全圆（rounded）。
+
+## 示例
+
+### 全部主题
+横向对比 primary / secondary / black / danger 及 solid / outline / ghost。
+<Canvas of={ButtonStories.AllThemes} />
+
+### 形状对比
+`shape="rectangle"` 与 `shape="rounded"`（Figma Shape=Rounded，`radius.rounded-full999`）。
+<Canvas of={ButtonStories.AllShapes} />
+
+### Primary Solid
+主色实心按钮，最常用的主操作样式。
+<Canvas of={ButtonStories.PrimarySolid} />
+
+### 胶囊圆角
+`shape="rounded"` 的胶囊按钮。
+<Canvas of={ButtonStories.Rounded} />
+
+### 小尺寸
+`size="sm"`：字号 `size.md` 13px / 行高 18，高度 24。
+<Canvas of={ButtonStories.Small} />
+
+### 大尺寸
+`size="lg"`：字号 `size.lg` 16px / 行高 24，高度 40。
+<Canvas of={ButtonStories.Large} />
+
+### 三档字号对比
+Small / Default 均为 13px，Large 为 16px（对齐 Figma）。
+<Canvas of={ButtonStories.AllSizes} />
+
+### 禁用
+禁用态不可点击，用于权限或前置条件未满足时。
+<Canvas of={ButtonStories.Disabled} />
+
+### 带前置图标
+通过 `leadingIcon` 在文案前放置图标。
+<Canvas of={ButtonStories.WithLeadingIcon} />
+
+## 用法
+
+```tsx
+import { Button } from '@agentos/design-system'
+
+<Button theme="primary" appearance="solid" size="default">
+  Confirm
+</Button>
+
+<Button theme="primary" appearance="solid" shape="rounded" leadingIcon={<Star />}>
+  Confirm
+</Button>
+```
+
+## Props
+
+<Controls of={ButtonStories.PrimarySolid} />
+
+## 相关 Token
+
+<TokenUsage id="button" color font />

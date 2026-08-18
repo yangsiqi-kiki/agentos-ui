@@ -1,0 +1,54 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeBaseLayoutStories from './KnowledgeBaseLayout.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../docs/_layout'
+
+<Meta of={KnowledgeBaseLayoutStories} />
+
+<ComponentMeta id="knowledge-base-layout" />
+
+## 概述
+
+知识库布局是知识库相关页面的共享外壳：全局顶栏、左侧 CUI 侧栏、工作区标签栏与面包屑行。面包屑下方通过 `children` 替换页面主体内容。
+
+## 示例
+
+### 默认
+<StoryLink
+  storyId="layouts-knowledgebaselayout--default"
+  label="在独立视图中打开默认示例"
+/>
+
+### 无侧栏
+<StoryLink
+  storyId="layouts-knowledgebaselayout--without-sidebar"
+  label="在独立视图中打开无侧栏示例"
+/>
+
+### 全部变体
+<StoryLink
+  storyId="layouts-knowledgebaselayout--all-variants"
+  label="在独立视图中打开全部变体"
+/>
+
+## 用法
+
+```tsx
+import { KnowledgeBaseLayout } from '@agentos/design-system'
+
+<KnowledgeBaseLayout
+  breadcrumbItems={[
+    { label: 'Knowledge base' },
+    { label: 'All knowledge bases' },
+  ]}
+>
+  <div>Page body</div>
+</KnowledgeBaseLayout>
+```
+
+## Props
+
+<Controls of={KnowledgeBaseLayoutStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-base-layout" color />

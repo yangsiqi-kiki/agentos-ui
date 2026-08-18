@@ -1,0 +1,52 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as RadioStories from './Radio.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={RadioStories} />
+
+<ComponentMeta id="radio" />
+
+## 概述
+
+单选框从少量选项中选择唯一一项，支持经典圆点与按钮组形态。
+
+## 示例
+
+### 水平分组
+选项横向排列的 RadioGroup。
+<Canvas of={RadioStories.GroupHorizontal} />
+
+### 垂直分组
+选项纵向排列，适合选项文案较长时。
+<Canvas of={RadioStories.GroupVertical} />
+
+### 按钮组尺寸
+按钮形态单选在不同尺寸下的对比。
+<Canvas of={RadioStories.ButtonGroupSizes} />
+
+### 按钮组分隔线
+按钮之间默认不显示分隔线，可通过 `showSeparator` 开启。
+<Canvas of={RadioStories.ButtonGroupWithSeparator} />
+
+### 禁用（已选）
+已选中且不可更改的禁用项。
+<Canvas of={RadioStories.DisabledChecked} />
+
+## 用法
+
+```tsx
+import { Radio, RadioGroup } from '@agentos/design-system'
+
+<RadioGroup defaultValue="a">
+  <Radio value="a">选项 A</Radio>
+  <Radio value="b">选项 B</Radio>
+</RadioGroup>
+```
+
+## Props
+
+<Controls of={RadioStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="radio" color />

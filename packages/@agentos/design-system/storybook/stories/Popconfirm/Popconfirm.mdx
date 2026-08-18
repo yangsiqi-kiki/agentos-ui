@@ -1,0 +1,55 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as PopconfirmStories from './Popconfirm.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={PopconfirmStories} />
+
+<ComponentMeta id="popconfirm" />
+
+## 概述
+
+由 Popover 衍生的确认气泡，用于删除等需二次确认的轻量操作。默认展示警告图标、标题、描述与取消/确认按钮，支持 12 种弹出位置。
+
+## 示例
+
+### 默认
+带警告图标的确认气泡。
+<Canvas of={PopconfirmStories.Default} />
+
+### 底部弹出
+`placement="bottom"`。
+<Canvas of={PopconfirmStories.Bottom} />
+
+### 无图标
+隐藏语义图标。
+<Canvas of={PopconfirmStories.WithoutIcon} />
+
+### 全部变体
+默认与无图标对比。
+<Canvas of={PopconfirmStories.AllVariants} />
+
+### 全部位置
+12 种 `placement` 箭头位置。
+<Canvas of={PopconfirmStories.AllPlacements} />
+
+## 用法
+
+```tsx
+import { Popconfirm, Button } from '@agentos/design-system'
+
+<Popconfirm
+  title="Confirm"
+  description="Are you sure you want to delete?"
+  onConfirm={() => {}}
+>
+  <Button theme="danger" appearance="outline">Delete</Button>
+</Popconfirm>
+```
+
+## Props
+
+<Controls of={PopconfirmStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="popconfirm" color font />

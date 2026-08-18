@@ -1,0 +1,33 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeProcessingResultViewStories from './KnowledgeProcessingResultView.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../docs/_layout'
+
+<Meta of={KnowledgeProcessingResultViewStories} />
+
+<ComponentMeta id="knowledge-processing-result-view" />
+
+## 概述
+
+处理结果视图支持「语义向量」卡片网格与「结构树」左右分栏详情两种模式，通过顶部分段控件切换。
+
+## 示例
+
+### 语义向量
+<StoryLink
+  storyId="organisms-knowledgeprocessingresultview--semantic"
+  label="在独立视图中打开语义向量示例"
+/>
+
+### 结构树
+<StoryLink
+  storyId="organisms-knowledgeprocessingresultview--structure"
+  label="在独立视图中打开结构树示例"
+/>
+
+## Props
+
+<Controls of={KnowledgeProcessingResultViewStories.Semantic} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-processing-result-view" color />

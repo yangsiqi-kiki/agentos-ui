@@ -1,0 +1,49 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as TagStories from './Tag.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={TagStories} />
+
+<ComponentMeta id="tag" />
+
+## 概述
+
+标签以紧凑标记展示分类、状态或关键词，支持描边、可关闭与语义色。
+
+## 示例
+
+### 全部颜色
+预览各色板标签的填充外观。
+<Canvas of={TagStories.AllColors} />
+
+### 语义变体
+信息 / 成功 / 警告 / 错误等语义色标签。
+<Canvas of={TagStories.SemanticVariants} />
+
+### 描边
+描边样式，背景更轻、边框更突出。
+<Canvas of={TagStories.Bordered} />
+
+### 可关闭
+带关闭按钮，用于可移除筛选条件。
+<Canvas of={TagStories.Closable} />
+
+### 尾部内容
+通过 `suffix` 保持行号等尾部信息常驻，主体长文本仍会截断。
+<Canvas of={TagStories.WithSuffix} />
+
+## 用法
+
+```tsx
+import { Tag } from '@agentos/design-system'
+
+<Tag color="blue" suffix="L12–30">设计系统</Tag>
+```
+
+## Props
+
+<Controls of={TagStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="tag" color font />

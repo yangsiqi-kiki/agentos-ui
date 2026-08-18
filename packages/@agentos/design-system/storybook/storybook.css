@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 覆盖 Storybook 默认 Nunito Sans，预览区统一走 AgentOS font token */
+html,
+body,
+#storybook-root,
+.sb-show-main,
+.sbdocs,
+.sbdocs.sbdocs-wrapper,
+.sbdocs .docs-story,
+.sbdocs .docblock-argstable {
+  font-family: var(--agentos-font-family-cn), var(--agentos-font-family-en),
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+}
+
+/* 避免 Docs 正文 16px 继承到组件；字号由组件自身 token 控制 */
+.sb-show-main,
+.sbdocs .docs-story {
+  font-size: var(--agentos-font-size-base);
+  line-height: var(--agentos-font-leading-22);
+}
+
+/* Docs 主布局：阅读宽度 + DESIGN.md token，贴近说明书形态 */
+.agentos-docs {
+  font-family: var(--agentos-font-family-cn), var(--agentos-font-family-en),
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--agentos-neutral-text-color-text);
+}
+
+.sbdocs.sbdocs-wrapper {
+  background: var(--agentos-neutral-bg-color-bg-layout) !important;
+  padding: 2.5rem 2rem 4rem !important;
+}
+
+.sbdocs.sbdocs-content {
+  max-width: 48rem !important;
+}
+
+.sbdocs.sbdocs-content:has(.agentos-docs-wide) {
+  max-width: 72rem !important;
+}
+
+.sbdocs .sbdocs-title,
+.sbdocs h1 {
+  color: var(--agentos-neutral-text-color-text-heading) !important;
+  font-size: var(--agentos-font-size-2xl) !important;
+  font-weight: var(--agentos-font-weight-semibold) !important;
+  line-height: var(--agentos-font-leading-32) !important;
+  border-bottom: none !important;
+  margin-bottom: 0.75rem !important;
+}
+
+.sbdocs h2 {
+  color: var(--agentos-neutral-text-color-text-heading) !important;
+  font-size: var(--agentos-font-size-xl) !important;
+  font-weight: var(--agentos-font-weight-semibold) !important;
+  line-height: var(--agentos-font-leading-28) !important;
+  border-bottom: 1px solid var(--agentos-neutral-border-color-border-secondary) !important;
+  padding-bottom: 0.5rem !important;
+  margin-top: 2.5rem !important;
+}
+
+.sbdocs h3 {
+  color: var(--agentos-neutral-text-color-text-heading) !important;
+  font-size: var(--agentos-font-size-lg) !important;
+  font-weight: var(--agentos-font-weight-semibold) !important;
+  line-height: var(--agentos-font-leading-24) !important;
+  margin-top: 1.75rem !important;
+}
+
+.sbdocs p,
+.sbdocs li {
+  color: var(--agentos-neutral-text-color-text-secondary);
+  font-size: var(--agentos-font-size-base);
+  line-height: var(--agentos-font-leading-22);
+}
+
+.sbdocs a {
+  color: var(--agentos-brand-link-color-link) !important;
+  text-decoration: none;
+}
+
+.sbdocs a:hover {
+  color: var(--agentos-brand-link-color-link-hover) !important;
+  text-decoration: underline;
+}
+
+/* Docs 内下载按钮：覆盖上方 a 链接色，保持主色底上的白字 */
+.sbdocs a.agentos-docs-download-link,
+.sbdocs a.agentos-docs-download-link:hover {
+  color: var(--agentos-neutral-text-color-text-light-solid) !important;
+  text-decoration: none;
+}
+
+.sbdocs code:not(pre code) {
+  background: var(--agentos-neutral-fill-color-fill-tertiary) !important;
+  color: var(--agentos-neutral-text-color-text) !important;
+  border-radius: var(--agentos-radius-rounded-sm4);
+  padding: 0.1em 0.35em;
+  font-size: 0.9em;
+}
+
+/* 源码块统一 Visual Studio Dark，避免浅底 + 深色主题高亮色导致看不清 */
+.sbdocs pre,
+.sbdocs .docblock-source,
+.sbdocs .docblock-source pre {
+  background: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  border: 1px solid #2d2d2d !important;
+  border-radius: var(--agentos-radius-rounded-lg8) !important;
+}
+
+.sbdocs pre code,
+.sbdocs .docblock-source code {
+  background: transparent !important;
+  color: inherit !important;
+}
+
+/* VS Dark token（覆盖 Prism / Storybook Source 默认色） */
+.sbdocs pre .token.comment,
+.sbdocs pre .token.prolog,
+.sbdocs pre .token.doctype,
+.sbdocs pre .token.cdata,
+.sbdocs .docblock-source .token.comment {
+  color: #6a9955 !important;
+}
+
+.sbdocs pre .token.punctuation,
+.sbdocs .docblock-source .token.punctuation {
+  color: #d4d4d4 !important;
+}
+
+.sbdocs pre .token.property,
+.sbdocs pre .token.tag,
+.sbdocs pre .token.boolean,
+.sbdocs pre .token.number,
+.sbdocs pre .token.constant,
+.sbdocs pre .token.symbol,
+.sbdocs .docblock-source .token.tag,
+.sbdocs .docblock-source .token.boolean,
+.sbdocs .docblock-source .token.number {
+  color: #569cd6 !important;
+}
+
+.sbdocs pre .token.selector,
+.sbdocs pre .token.attr-name,
+.sbdocs pre .token.string,
+.sbdocs pre .token.char,
+.sbdocs pre .token.builtin,
+.sbdocs .docblock-source .token.attr-name,
+.sbdocs .docblock-source .token.string {
+  color: #ce9178 !important;
+}
+
+.sbdocs pre .token.operator,
+.sbdocs pre .token.entity,
+.sbdocs pre .token.url,
+.sbdocs .docblock-source .token.operator {
+  color: #d4d4d4 !important;
+}
+
+.sbdocs pre .token.atrule,
+.sbdocs pre .token.attr-value,
+.sbdocs pre .token.keyword,
+.sbdocs .docblock-source .token.atrule,
+.sbdocs .docblock-source .token.attr-value,
+.sbdocs .docblock-source .token.keyword {
+  color: #c586c0 !important;
+}
+
+.sbdocs pre .token.function,
+.sbdocs pre .token.class-name,
+.sbdocs .docblock-source .token.function,
+.sbdocs .docblock-source .token.class-name {
+  color: #dcdcaa !important;
+}
+
+.sbdocs table {
+  font-size: var(--agentos-font-size-sm);
+}
+
+.sbdocs table thead tr {
+  background: var(--agentos-neutral-bg-color-bg-elevated) !important;
+}
+
+.sbdocs table th,
+.sbdocs table td {
+  border-color: var(--agentos-neutral-border-color-border-secondary) !important;
+  color: var(--agentos-neutral-text-color-text);
+}
+
+.sbdocs .docblock-argstable {
+  font-size: var(--agentos-font-size-sm);
+}
+
+/* 右侧目录 */
+.sbdocs-toc--desktop {
+  font-family: var(--agentos-font-family-cn), var(--agentos-font-family-en),
+    sans-serif;
+}
+
+.toc-wrapper .toc-list a {
+  color: var(--agentos-neutral-text-color-text-secondary) !important;
+}
+
+.toc-wrapper .toc-list a[data-active='true'],
+.toc-wrapper .toc-list .toc-list-item.is-active-li > a {
+  color: var(--agentos-brand-primary-color-primary) !important;
+  font-weight: var(--agentos-font-weight-medium);
+}

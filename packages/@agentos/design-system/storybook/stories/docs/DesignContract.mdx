@@ -1,0 +1,171 @@
+import { Meta } from '@storybook/blocks'
+import { DocHeader, DocTable, DownloadLink } from './_layout'
+
+<Meta title="Overview/设计契约" />
+
+<DocHeader
+  eyebrow="DESIGN.md"
+  title="设计契约"
+  description="DESIGN.md 是对外设计契约：把 Figma Variables、CSS 变量与 Tailwind class 对齐，可脱离仓库单独阅读并放入你的项目使用。"
+/>
+
+## 这是什么
+
+`DESIGN.md` 面向设计方、设计工程与前端查阅。核心是三列对照：
+
+<DocTable
+  columns={['列', '含义', '谁用']}
+  rows={[
+    [<strong>Figma 路径</strong>, 'Figma Variables 层级名', '设计师绑定变量'],
+    [
+      <strong>CSS 变量</strong>,
+      <>
+        运行时 <code>--agentos-*</code>
+      </>,
+      '前端 / 样式',
+    ],
+    [
+      <strong>Tailwind</strong>,
+      <>
+        <code>text-agentos-*</code> 等 class
+      </>,
+      '前端实现',
+    ],
+  ]}
+/>
+
+设计师在 Figma 中绑定变量时使用 **Figma 路径**；前端实现时映射到 **CSS 变量**或 **Tailwind** class。组件禁止硬编码色值。
+
+### 语义分组
+
+- **Neutral**：文本、背景、边框、填充等中性语义
+- **Brand**：主色、链接、成功 / 警告 / 错误
+- **Base**：色阶原语（如 Blue 50–900），供语义色引用
+- **MaskBase / MaskSenior**：遮罩透明度
+
+### 开发时怎么选 token
+
+1. **优先语义色**：按钮主色用 `bg-agentos-brand-primary-color-primary`，不要直接写 `bg-agentos-base-blue-500`。
+2. **文本层级**：正文 / 次要 / 占位分别用 `colorText` / `colorTextSecondary` / `colorTextPlaceholder`。
+3. **完整清单**：日常查阅本 Storybook 的 Tokens 页；需要全量对照时打开包内 `docs/token-reference.md`，或使用下方下载包中的附录。
+
+### 在本仓库中如何重新生成
+
+源文件在 `src/tokens/source/*.json`（Figma 导出）。修改后运行：
+
+```bash
+pnpm --filter @agentos/design-system build:tokens
+```
+
+会重新生成 `tokens.css`、`generated-theme.ts`、`DESIGN.md` 与 `docs/token-reference.md`。
+
+---
+
+## 下载设计契约包
+
+将 DESIGN.md 及相关附录打包后的 zip，可直接下载到你的项目中使用：
+
+<DownloadLink
+  href="https://insight-expert-agent-001.oss-cn-shanghai.aliyuncs.com/design-system/design-system-doc/design-system.zip"
+  label="下载 design-system.zip"
+/>
+
+解压后通常包含 `DESIGN.md` 与完整 token 附录。请将文件放到项目中便于 Agent 与人查阅的位置（例如仓库根目录或 `docs/`）。
+
+---
+
+## 如何在你的项目中使用
+
+外部 React / Next.js 项目可按下列顺序接入：
+
+1. **下载**上方 zip，把 `DESIGN.md`（及附录）放入项目。
+2. **复制** [组件生成 Skill](?path=/docs/overview-组件生成-skill--docs) 全文到 `.agents/skills/component-creator/SKILL.md`。
+3. **确保** Cursor 已连接 Figma MCP（若从设计稿生成）。
+4. **向 Agent 发送**下方提示词模板，替换 `<...>` 占位内容。
+
+Skill 会先探测项目（是否有 Storybook / Tailwind / shadcn），缺依赖时会初始化基建，再按 `DESIGN.md` 映射 token 并生成组件。
+
+### 发给 Agent 的提示词模板
+
+```markdown
+# Design System 组件任务
+
+请调用 `.agents/skills/component-creator/SKILL.md` 完成此任务。
+项目内已放置 `DESIGN.md`（及可选 token 附录），请按其命名空间映射 token，禁止硬编码色值。
+
+## 任务信息
+
+- 变更类型：<新增组件 / 修改已有组件 / 补齐 Storybook / 初始化 UI 基建>
+- Figma 链接：<包含 node-id 的组件或组件集链接；无则可留空并用文字描述>
+- 组件名称：<英文组件名；不确定时请根据设计和职责判断>
+- 期望层级：<atoms / molecules / organisms / layouts / pages；不确定可留空>
+
+## 组件描述
+
+### 组件作用
+
+<这个组件解决什么问题、向用户表达什么信息或提供什么能力>
+
+### 使用场景
+
+- <主要使用场景>
+- <次要使用场景>
+- <不应该使用该组件的场景>
+
+### 对外交互 Actions
+
+- `<Action 或回调名称>`：<触发条件、参数和预期结果>
+- 键盘交互：<Enter / Escape / 方向键 / Tab 等行为>
+- 焦点行为：<初始焦点、焦点移动与关闭后的焦点恢复>
+
+### 状态与变体
+
+- 尺寸：<例如 sm / default / lg>
+- 视觉变体：<例如 primary / secondary / danger>
+- 交互状态：<例如 default / hover / active / focus / disabled / loading>
+- 内容状态：<例如 empty / overflow / error / success>
+
+### 特殊场景
+
+- <超长文本、空数据、极端数值等边界情况>
+- <异步加载、请求失败、重复点击等异常情况>
+- <移动端、窄容器或响应式行为>
+- <无障碍要求，例如 aria-label、读屏顺序或键盘操作>
+
+### 对外 API
+
+- 必需 props：<名称、类型与用途>
+- 可选 props：<名称、类型、默认值与用途>
+- 受控/非受控：<value/defaultValue、open/defaultOpen 等约定>
+- 文案覆盖：<label、placeholder、aria-label、空态等可覆盖文案>
+
+## 实现要求
+
+1. 先完成项目探测（框架、Tailwind、shadcn、Storybook、DESIGN.md）。
+2. 若缺 Tailwind / shadcn，按 skill 脚手架步骤安装并初始化，再依据 DESIGN.md 写入 token。
+3. 有 Figma 时通过 MCP 获取 design context、截图和变量定义，不要根据截图猜测 token。
+4. 对照 DESIGN.md（及附录）完成 Figma Variables 到项目 token 的映射。
+5. 优先复用已有 primitive；图标使用 Lucide 或 Tabler，禁止手写内联 SVG。
+6. 仅当项目已有 Storybook 时补齐 CSF story（及项目既有的 MDX 约定）。
+7. 所有默认文案使用英文且可通过 props 覆盖，不在组件库中引入 i18n 运行时。
+8. 保留工作区中与本任务无关的已有改动。
+
+## 验收标准
+
+- <视觉和 Figma 一致的具体要求>
+- <交互与 Actions 的预期行为>
+- <必须在 Storybook 中展示的状态或场景（若有 Storybook）>
+- lint、typecheck 通过
+
+信息不足且会影响组件 API、交互或视觉实现时，请先向我提问确认；其余内容按
+skill 和项目现有模式直接实现。完成后汇报能力矩阵、改动文件、复用组件、
+token 映射、校验结果及仍需人工确认的差异。
+```
+
+若设计中包含复杂交互、响应式行为或 Figma 未表达的业务规则，请在提示词中补充验收标准。
+
+## 相关链接
+
+- [组件生成 Skill](?path=/docs/overview-组件生成-skill--docs) — 复制 skill 到你的仓库
+- [用法](?path=/docs/overview-用法--docs) — 在本 monorepo 中接入 `@agentos/design-system`
+- [贡献组件](?path=/docs/overview-贡献组件--docs) — 在本仓库内向 design-system 包贡献组件

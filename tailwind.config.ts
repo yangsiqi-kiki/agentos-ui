@@ -6,6 +6,6 @@ export default {
   content: [
     './index.html',
     './src/**/*.{ts,tsx}',
-    './node_modules/@agentos/design-system/src/**/*.{ts,tsx}',
+    './packages/@agentos/design-system/src/**/*.{ts,tsx}',
   ],
 } satisfies Config

@@ -1,0 +1,53 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as TreeStories from './Tree.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={TreeStories} />
+
+<ComponentMeta id="tree" />
+
+## 概述
+
+树展示可展开的层级数据节点，支持图标、勾选、尺寸与展开切换器样式。
+
+## 示例
+
+### 默认
+基础可展开树节点。
+<Canvas of={TreeStories.Default} />
+
+### 带图标
+节点前展示文件夹 / 文件等图标。
+<Canvas of={TreeStories.WithIcons} />
+
+### 可勾选
+节点带 Checkbox，支持多选。
+<Canvas of={TreeStories.Checkable} />
+
+### 尺寸
+对比不同字号 / 行高的树。
+<Canvas of={TreeStories.Sizes} />
+
+### 受控嵌套
+展开与勾选状态由外部受控管理。
+<Canvas of={TreeStories.NestedControlled} />
+
+## 用法
+
+```tsx
+import { Tree } from '@agentos/design-system'
+
+<Tree
+  treeData={[
+    { key: '1', title: '根节点', children: [{ key: '1-1', title: '子节点' }] },
+  ]}
+/>
+```
+
+## Props
+
+<Controls of={TreeStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="tree" color font />

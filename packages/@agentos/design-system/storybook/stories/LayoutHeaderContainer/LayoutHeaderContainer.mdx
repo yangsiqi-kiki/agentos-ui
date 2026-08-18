@@ -1,0 +1,52 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as LayoutHeaderContainerStories from './LayoutHeaderContainer.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../docs/_layout'
+
+<Meta of={LayoutHeaderContainerStories} />
+
+<ComponentMeta id="layout-header-container" />
+
+## 概述
+
+上下结构布局：顶部 header 与下方 container，不承载业务内容；具体内容通过 `header` 与 `children` 注入。
+
+## 示例
+
+### 默认
+基础上下布局：顶栏 + 主体。
+<StoryLink
+  storyId="layouts-layoutheadercontainer--default"
+  label="在独立视图中打开默认示例"
+/>
+
+### 带侧栏
+主体区内组合侧栏与主面板。
+<StoryLink
+  storyId="layouts-layoutheadercontainer--with-sidebar"
+  label="在独立视图中打开带侧栏示例"
+/>
+
+### 全部变体
+集中展示主要布局用法。
+<StoryLink
+  storyId="layouts-layoutheadercontainer--all-variants"
+  label="在独立视图中打开全部变体"
+/>
+
+## 用法
+
+```tsx
+import { LayoutHeaderContainer } from '@agentos/design-system'
+
+<LayoutHeaderContainer header={<span>Header</span>}>
+  <main>Content</main>
+</LayoutHeaderContainer>
+```
+
+## Props
+
+<Controls of={LayoutHeaderContainerStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="layout-header-container" color font />

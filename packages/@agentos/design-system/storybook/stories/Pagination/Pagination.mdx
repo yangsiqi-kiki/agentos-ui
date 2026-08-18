@@ -1,0 +1,49 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as PaginationStories from './Pagination.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={PaginationStories} />
+
+<ComponentMeta id="pagination" />
+
+## 概述
+
+分页用于在长列表或表格的多页数据间导航，支持完整、简洁与仅导航模式。
+
+## 示例
+
+### 默认
+完整分页：页码、跳转与每页条数。
+<Canvas of={PaginationStories.Default} />
+
+### 全部尺寸
+对比不同尺寸的分页控件。
+<Canvas of={PaginationStories.AllSizes} />
+
+### 简洁
+精简版分页，信息密度更低。
+<Canvas of={PaginationStories.Simple} />
+
+### 仅导航
+只保留上一页 / 下一页，适合移动端或窄栏。
+<Canvas of={PaginationStories.NavigationOnly} />
+
+### 禁用
+不可操作的分页态。
+<Canvas of={PaginationStories.Disabled} />
+
+## 用法
+
+```tsx
+import { Pagination } from '@agentos/design-system'
+
+<Pagination total={100} pageSize={10} current={1} />
+```
+
+## Props
+
+<Controls of={PaginationStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="pagination" color font />

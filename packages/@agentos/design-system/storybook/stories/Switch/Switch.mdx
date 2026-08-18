@@ -1,0 +1,45 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as SwitchStories from './Switch.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={SwitchStories} />
+
+<ComponentMeta id="switch" />
+
+## 概述
+
+开关在开 / 关两种状态之间切换设置，支持圆角、矩形、线性样式及轨道文案 / 图标。
+
+## 示例
+
+### 全部变体
+一次性预览圆角、矩形、线性等样式组合。
+<Canvas of={SwitchStories.AllVariants} />
+
+### 默认
+基础开 / 关切换。
+<Canvas of={SwitchStories.Default} />
+
+### 轨道文案
+在轨道上显示 On / Off 等简短文案。
+<Canvas of={SwitchStories.WithTrackText} />
+
+### 禁用（开启）
+已开启且不可切换的禁用态。
+<Canvas of={SwitchStories.DisabledChecked} />
+
+## 用法
+
+```tsx
+import { Switch } from '@agentos/design-system'
+
+<Switch defaultChecked />
+```
+
+## Props
+
+<Controls of={SwitchStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="switch" color />

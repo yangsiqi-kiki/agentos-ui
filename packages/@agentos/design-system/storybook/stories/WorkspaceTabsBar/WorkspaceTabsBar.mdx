@@ -1,0 +1,45 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as WorkspaceTabsBarStories from './WorkspaceTabsBar.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={WorkspaceTabsBarStories} />
+
+<ComponentMeta id="workspace-tabs-bar" />
+
+## 概述
+
+工作区标签栏用于在工作区内切换多个标签页视图。
+
+## 示例
+
+### 默认
+默认工作区标签栏布局与交互。
+<Canvas of={WorkspaceTabsBarStories.Default} />
+
+### 自定义标签
+自定义标签文案与数量。
+<Canvas of={WorkspaceTabsBarStories.CustomTabs} />
+
+### 置灰（非 focus 分屏）
+`dimmed` 用于多分屏场景下非 focus 分屏的标签栏：整体调暗并抑制选中态主色高亮，但标签仍可点击（点击后应先使该分屏获得 focus 再切换标签）。
+<Canvas of={WorkspaceTabsBarStories.Dimmed} />
+
+### 右侧操作区
+通过 `rightActions` 在标签栏最右侧注入自定义操作按钮。
+<Canvas of={WorkspaceTabsBarStories.WithRightActions} />
+
+## 用法
+
+```tsx
+import { WorkspaceTabsBar } from '@agentos/design-system'
+
+<WorkspaceTabsBar />
+```
+
+## Props
+
+<Controls of={WorkspaceTabsBarStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="workspace-tabs-bar" color font />

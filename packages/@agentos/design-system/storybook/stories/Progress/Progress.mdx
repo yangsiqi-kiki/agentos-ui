@@ -1,0 +1,45 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as ProgressStories from './Progress.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={ProgressStories} />
+
+<ComponentMeta id="progress" />
+
+## 概述
+
+进度条可视化任务或流程的完成进度，支持线形、环形与迷你尺寸，以及成功 / 错误等状态。
+
+## 示例
+
+### 线形状态
+对比 normal / success / exception 等线形进度。
+<Canvas of={ProgressStories.LineStatuses} />
+
+### 线形尺寸
+不同粗细 / 高度的线形进度条。
+<Canvas of={ProgressStories.LineSizes} />
+
+### 环形
+圆形进度，适合仪表盘或紧凑卡片。
+<Canvas of={ProgressStories.Circle} />
+
+### 迷你
+极小尺寸进度，用于列表或表格单元格。
+<Canvas of={ProgressStories.Mini} />
+
+## 用法
+
+```tsx
+import { Progress } from '@agentos/design-system'
+
+<Progress percent={60} status="normal" />
+```
+
+## Props
+
+<Controls of={ProgressStories.LineStatuses} />
+
+## 相关 Token
+
+<TokenUsage id="progress" color font />

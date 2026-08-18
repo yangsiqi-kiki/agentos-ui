@@ -1,0 +1,41 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeBaseListPageStories from './KnowledgeBaseListPage.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../../docs/_layout'
+
+<Meta of={KnowledgeBaseListPageStories} />
+
+<ComponentMeta id="knowledge-base-list-page" />
+
+## 概述
+
+全部知识库页是知识库列表场景的完整页面组合示例：顶栏 + 左侧 CUI 占位区 + 右侧工作区标签、面包屑、状态筛选与文档卡片网格。
+
+## 示例
+
+### 默认
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebaselistpage--default"
+  label="在独立视图中打开默认示例"
+/>
+
+### 自定义文案
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebaselistpage--custom-copy"
+  label="在独立视图中打开自定义文案示例"
+/>
+
+## 用法
+
+```tsx
+import { KnowledgeBaseListPage } from '@agentos/design-system'
+
+<KnowledgeBaseListPage />
+```
+
+## Props
+
+<Controls of={KnowledgeBaseListPageStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-base-list-page" color />

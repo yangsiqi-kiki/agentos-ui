@@ -1,0 +1,47 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as FormItemStories from './FormItem.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={FormItemStories} />
+
+<ComponentMeta id="form-item" />
+
+## 概述
+
+表单项将字段、校验与操作组织为结构化数据录入单元，支持水平 / 垂直布局与帮助提示。
+
+## 示例
+
+### 水平布局
+标签与控件同一行，适合设置页表单。
+<Canvas of={FormItemStories.Horizontal} />
+
+### 垂直布局
+标签在上、控件在下，适合窄栏或移动端。
+<Canvas of={FormItemStories.Vertical} />
+
+### 必填与帮助
+展示必填星号与帮助说明文案。
+<Canvas of={FormItemStories.RequiredWithHelp} />
+
+### 带 Tooltip
+标签旁附加悬浮说明。
+<Canvas of={FormItemStories.WithTooltip} />
+
+## 用法
+
+```tsx
+import { FormItem, Input } from '@agentos/design-system'
+
+<FormItem label="名称" required>
+  <Input placeholder="请输入名称" />
+</FormItem>
+```
+
+## Props
+
+<Controls of={FormItemStories.Horizontal} />
+
+## 相关 Token
+
+<TokenUsage id="form-item" color font />

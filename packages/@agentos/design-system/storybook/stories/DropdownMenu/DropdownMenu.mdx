@@ -1,0 +1,67 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as DropdownMenuStories from './DropdownMenu.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={DropdownMenuStories} />
+
+<ComponentMeta id="dropdown-menu" />
+
+## 概述
+
+下拉菜单，用于触发器旁展示一组操作或选项。菜单项视觉对齐 Figma Dropdown menu-item；其余结构沿用 shadcn DropdownMenu（Radix）API。
+
+## 示例
+
+### 默认
+基础城市列表，对齐 Figma menu-item 间距与排版。
+<Canvas of={DropdownMenuStories.Default} />
+
+### 带图标
+含 Label、分隔线、图标与快捷键。
+<Canvas of={DropdownMenuStories.WithIcons} />
+
+### 多选勾选
+`DropdownMenuCheckboxItem` 多选状态。
+<Canvas of={DropdownMenuStories.CheckboxItems} />
+
+### 单选
+`DropdownMenuRadioGroup` / `DropdownMenuRadioItem`。
+<Canvas of={DropdownMenuStories.RadioItems} />
+
+### 子菜单
+`DropdownMenuSub` 嵌套菜单。
+<Canvas of={DropdownMenuStories.WithSubMenu} />
+
+### 全部变体
+基础列表与带图标账号菜单并排预览。
+<Canvas of={DropdownMenuStories.AllVariants} />
+
+## 用法
+
+```tsx
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@agentos/design-system'
+
+<DropdownMenu>
+  <DropdownMenuTrigger asChild>
+    <Button>Open</Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent>
+    <DropdownMenuItem>Beijing</DropdownMenuItem>
+    <DropdownMenuItem>Shanghai</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Props
+
+<Controls of={DropdownMenuStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="dropdown-menu" color font />

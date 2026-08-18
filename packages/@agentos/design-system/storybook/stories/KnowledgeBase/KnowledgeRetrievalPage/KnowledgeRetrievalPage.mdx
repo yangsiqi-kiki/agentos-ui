@@ -1,0 +1,41 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeRetrievalPageStories from './KnowledgeRetrievalPage.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../../docs/_layout'
+
+<Meta of={KnowledgeRetrievalPageStories} />
+
+<ComponentMeta id="knowledge-retrieval-page" />
+
+## 概述
+
+知识检索页是知识库检索场景的完整页面组合示例，基于 KnowledgeBaseLayout + DetailShell + RetrievalView。
+
+## 示例
+
+### 默认
+<StoryLink
+  storyId="pages-knowledgebase-knowledgeretrievalpage--default"
+  label="在独立视图中打开默认示例"
+/>
+
+### 自定义文案
+<StoryLink
+  storyId="pages-knowledgebase-knowledgeretrievalpage--custom-copy"
+  label="在独立视图中打开自定义文案示例"
+/>
+
+## 用法
+
+```tsx
+import { KnowledgeRetrievalPage } from '@agentos/design-system'
+
+<KnowledgeRetrievalPage />
+```
+
+## Props
+
+<Controls of={KnowledgeRetrievalPageStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-retrieval-page" color />

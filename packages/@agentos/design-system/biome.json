@@ -1,0 +1,40 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.4.13/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "includes": [
+      "src/**/*.ts",
+      "src/**/*.tsx",
+      "storybook/**/*.ts",
+      "storybook/**/*.tsx",
+      "tailwind.preset.ts",
+      "!!node_modules",
+      "!!storybook/dist"
+    ]
+  },
+  "formatter": {
+    "enabled": false
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "a11y": "off",
+      "complexity": "off",
+      "correctness": "off",
+      "style": {
+        "useImportType": "off",
+        "noNonNullAssertion": "off",
+        "useExportType": "off"
+      },
+      "suspicious": "off"
+    }
+  },
+  "assist": {
+    "enabled": false
+  }
+}

@@ -1,0 +1,39 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeRetrievalViewStories from './KnowledgeRetrievalView.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../docs/_layout'
+
+<Meta of={KnowledgeRetrievalViewStories} />
+
+<ComponentMeta id="knowledge-retrieval-view" />
+
+## 概述
+
+知识检索视图：左侧检索配置面板，右侧支持空态、结果列表与命中详情三种状态。
+
+## 示例
+
+### 空态
+<StoryLink
+  storyId="organisms-knowledgeretrievalview--empty"
+  label="在独立视图中打开空态示例"
+/>
+
+### 结果列表
+<StoryLink
+  storyId="organisms-knowledgeretrievalview--results"
+  label="在独立视图中打开结果列表示例"
+/>
+
+### 命中详情
+<StoryLink
+  storyId="organisms-knowledgeretrievalview--detail"
+  label="在独立视图中打开命中详情示例"
+/>
+
+## Props
+
+<Controls of={KnowledgeRetrievalViewStories.Empty} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-retrieval-view" color />

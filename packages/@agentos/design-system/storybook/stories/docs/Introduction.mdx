@@ -1,0 +1,93 @@
+import { Meta } from '@storybook/blocks'
+import { DocHeader, DocTable } from './_layout'
+
+<Meta title="Overview/简介" />
+
+<DocHeader
+  eyebrow="AgentOS Design System"
+  title="简介"
+  description="AgentOS 特供 UI 库的设计说明书：tokens、分层组件与 Tailwind preset。"
+/>
+
+## 这是什么
+
+`@agentos/design-system` 是 AgentOS 产品的设计系统包，统一：
+
+- **Design Tokens**：颜色、字体、圆角、间距等语义变量（`--agentos-*`）
+- **React 组件**：按原子设计分层实现的可复用 UI
+- **Tailwind Preset**：宿主应用可直接接入的主题扩展
+
+本 Storybook 即该设计系统的在线说明书，面向设计师、产品与前端开发共同阅读。
+
+## 命名空间
+
+<DocTable
+  columns={['类型', '约定']}
+  rows={[
+    ['CSS 变量', <code>--agentos-*</code>],
+    [
+      'Tailwind 颜色',
+      <>
+        <code>text-agentos-*</code> / <code>bg-agentos-*</code> /{' '}
+        <code>border-agentos-*</code>
+      </>,
+    ],
+    [
+      'Tailwind 字体',
+      <>
+        <code>font-agentos</code>、<code>text-agentos-*</code>（字号）
+      </>,
+    ],
+    [
+      'Tailwind 圆角 / 间距',
+      <>
+        <code>rounded-agentos-*</code>、<code>agentos-margin-*</code> 等
+      </>,
+    ],
+  ]}
+/>
+
+组件实现禁止硬编码色值，一律使用语义 token，以便后续接入暗色模式时无需改组件代码。
+
+## 包结构
+
+```
+packages/@agentos/design-system
+├── DESIGN.md                 # 对外设计契约（Figma ↔ CSS ↔ Tailwind）
+├── docs/token-reference.md   # 完整 token 附录
+├── src/
+│   ├── tokens/               # 源 JSON、生成 CSS / theme
+│   ├── components/
+│   │   ├── atoms/
+│   │   ├── molecules/
+│   │   ├── organisms/
+│   │   ├── layouts/
+│   │   └── pages/
+│   └── index.ts              # 公共导出
+└── storybook/                # 本说明书
+```
+
+## 组件分层
+
+<DocTable
+  columns={['层级', '说明', '示例']}
+  rows={[
+    ['Atoms', '最小可复用单元', 'Button、Input、Tag'],
+    ['Molecules', '原子组合', 'FormItem、Pagination、Modal'],
+    ['Organisms', '独立功能区块', 'PageHeader、WorkspaceTabsBar'],
+    ['Layouts', '页面骨架', 'LayoutHeaderContainer'],
+    ['Pages', '完整页面组合', 'KnowledgeRetrievalPage'],
+  ]}
+/>
+
+侧边栏按上述层级组织组件文档；**Tokens** 分区单独展示 Color / Typography。
+
+## 从这里开始
+
+1. **[用法](?path=/docs/overview-用法--docs)** — 非开发人员如何浏览；开发人员如何接入本包
+2. **[设计契约](?path=/docs/overview-设计契约--docs)** — DESIGN.md 说明、下载包与在外部项目中的使用方式
+3. **[组件生成 Skill](?path=/docs/overview-组件生成-skill--docs)** — 复制 component-creator skill 到你的仓库
+4. **[贡献组件](?path=/docs/overview-贡献组件--docs)** — 在本仓库内使用 skill 与 Figma MCP 新增或变更组件
+5. **[Tokens / Color](?path=/story/tokens-color--semantic)** — 语义色与色阶色板
+6. **[Tokens / Typography](?path=/story/tokens-typography--font-family)** — 字体与排版阶梯
+7. 左侧 **Atoms / Molecules / …** — 各组件的描述、示例、Props 与相关 token

@@ -1,0 +1,59 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as UploadStories from './Upload.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={UploadStories} />
+
+<ComponentMeta id="upload" />
+
+## 概述
+
+上传组件用于选择文件并展示上传列表。支持按钮与拖拽两种触发方式，以及上传中 / 成功 / 失败三种文件状态。当前实现覆盖 File List 形态。
+
+## 示例
+
+### 按钮触发
+默认按钮触发 + 已上传文件列表。
+<Canvas of={UploadStories.ButtonTrigger} />
+
+### 拖拽触发
+拖拽区域触发，支持 hover 高亮。
+<Canvas of={UploadStories.DragTrigger} />
+
+### 上传中
+文件项展示迷你环形进度。
+<Canvas of={UploadStories.Uploading} />
+
+### 失败
+文件名标红，并在下方展示错误详情。
+<Canvas of={UploadStories.Error} />
+
+### 全部变体
+按钮 / 拖拽触发与多种文件状态聚合展示。
+<Canvas of={UploadStories.AllVariants} />
+
+## 用法
+
+```tsx
+import { Upload } from '@agentos/design-system'
+
+<Upload
+  trigger="button"
+  triggerLabel="Upload"
+  fileList={fileList}
+  onSelect={(files) => {
+    // 更新 fileList
+  }}
+  onRemove={(file) => {
+    // 从 fileList 移除
+  }}
+/>
+```
+
+## Props
+
+<Controls of={UploadStories.ButtonTrigger} />
+
+## 相关 Token
+
+<TokenUsage id="upload" color font />

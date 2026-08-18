@@ -1,0 +1,41 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as BackgroundJobsBarStories from './BackgroundJobsBar.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../docs/_layout'
+
+<Meta of={BackgroundJobsBarStories} />
+
+<ComponentMeta id="background-jobs-bar" />
+
+## 概述
+
+Space Chat Composer 上方的会话后台任务观测条：默认折叠显示任务计数，展开后按任务展示操作名、状态 badge 与操作按钮（执行中可取消、产品 final 可「知道了」dismiss）。
+
+状态口径：产品 final（succeeded / canceled / rolled_back）可 dismiss 并触发一次消息刷新；canceling 显示「取消中」；其余异常终态显示「状态未知」并持续轮询。无未 dismiss 任务时观测条不渲染。
+
+## 示例
+
+### 折叠态
+<StoryLink
+  storyId="pages-backgroundjobsbar--collapsed"
+  label="在独立视图中打开折叠态示例"
+/>
+
+### 多任务混合状态
+<StoryLink
+  storyId="pages-backgroundjobsbar--mixed-states"
+  label="在独立视图中打开混合状态示例"
+/>
+
+### 未知状态
+<StoryLink
+  storyId="pages-backgroundjobsbar--unknown-status"
+  label="在独立视图中打开未知状态示例"
+/>
+
+## Props
+
+<Controls of={BackgroundJobsBarStories.Collapsed} />
+
+## 相关 Token
+
+<TokenUsage id="background-jobs-bar" color font />

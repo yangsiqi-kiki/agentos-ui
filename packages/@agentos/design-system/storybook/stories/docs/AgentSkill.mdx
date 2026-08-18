@@ -1,0 +1,71 @@
+import { Meta } from '@storybook/blocks'
+import { CopyableCodeBlock, DocHeader, DocTable } from './_layout'
+import {
+  SKILL_DESCRIPTION,
+  SKILL_SAVE_PATH,
+  SKILL_SOURCE,
+} from './skill-source.anti-pattern'
+
+<Meta title="Overview/组件生成 Skill" />
+
+<DocHeader
+  eyebrow="component-creator"
+  title="组件生成 Skill"
+  description={SKILL_DESCRIPTION}
+/>
+
+## 这是什么
+
+`component-creator` 是给 Cursor Agent 使用的技能说明（Skill）。Agent 读取后会：
+
+1. 探测项目形态（React / Next.js、Tailwind、shadcn、Storybook、`DESIGN.md`）
+2. 缺依赖时安装并初始化 UI 基建
+3. 按 `DESIGN.md`（若存在）映射 token，生成 shadcn 风格组件
+4. 仅当检测到 Storybook 时写入 story
+
+完整正文见下方，可一键复制到你的仓库。
+
+## 放到你的仓库
+
+<DocTable
+  columns={['步骤', '说明']}
+  rows={[
+    [
+      '1. 创建路径',
+      <>
+        在项目根目录创建 <code>{SKILL_SAVE_PATH}</code>
+      </>,
+    ],
+    ['2. 粘贴内容', '点击下方「一键复制」，粘贴覆盖该文件'],
+    [
+      '3. 放置 DESIGN.md',
+      <>
+        建议同时下载并放入{' '}
+        <a href="?path=/docs/overview-设计契约--docs">设计契约</a>
+        ，以便 Agent 按 token 映射
+      </>,
+    ],
+    [
+      '4. 发起任务',
+      <>
+        在 Cursor Agent 对话中引用该 skill，或使用设计契约页中的提示词模板
+      </>,
+    ],
+  ]}
+/>
+
+## SKILL.md 全文
+
+点击「一键复制」后，将内容保存为：
+
+```
+.agents/skills/component-creator/SKILL.md
+```
+
+<CopyableCodeBlock content={SKILL_SOURCE} label="SKILL.md" />
+
+## 相关链接
+
+- [设计契约 DESIGN.md](?path=/docs/overview-设计契约--docs) — 下载设计契约包与提示词模板
+- [贡献组件](?path=/docs/overview-贡献组件--docs) — 在本仓库内贡献组件的完整流程
+- [用法](?path=/docs/overview-用法--docs) — 接入本包

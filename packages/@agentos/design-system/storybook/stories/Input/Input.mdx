@@ -1,0 +1,45 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as InputStories from './Input.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={InputStories} />
+
+<ComponentMeta id="input" />
+
+## 概述
+
+输入框用于输入和编辑短文本，支持前后缀、尺寸与校验状态（danger / warning / success）。
+
+## 示例
+
+### 默认
+基础单行文本输入。
+<Canvas of={InputStories.Default} />
+
+### 前后缀
+在输入区两侧放置图标或附加文案。
+<Canvas of={InputStories.WithPrefixAndSuffix} />
+
+### 全部尺寸
+对比 sm / default / lg 三种高度。
+<Canvas of={InputStories.AllSizes} />
+
+### 全部状态
+展示 danger / warning / success 等校验反馈。
+<Canvas of={InputStories.AllStatuses} />
+
+## 用法
+
+```tsx
+import { Input } from '@agentos/design-system'
+
+<Input placeholder="请输入" size="default" />
+```
+
+## Props
+
+<Controls of={InputStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="input" color font />

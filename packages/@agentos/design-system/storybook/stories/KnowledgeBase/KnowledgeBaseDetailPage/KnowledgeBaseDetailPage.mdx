@@ -1,0 +1,76 @@
+import { Meta, Controls } from '@storybook/blocks'
+import * as KnowledgeBaseDetailPageStories from './KnowledgeBaseDetailPage.stories'
+import { ComponentMeta, StoryLink, TokenUsage } from '../../docs/_layout'
+
+<Meta of={KnowledgeBaseDetailPageStories} />
+
+<ComponentMeta id="knowledge-base-detail-page" />
+
+## 概述
+
+知识库详情页组合 `KnowledgeBaseLayout` 与 `KnowledgeBaseDetailShell`，并在内容页签下注入原始内容 / 处理结果 / 知识检索视图。本页提供 7 个 Figma 状态 story。
+
+## 示例
+
+### 原始内容
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--original-content"
+  label="在独立视图中打开原始内容"
+/>
+
+### 处理结果 · 语义向量
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--processing-semantic"
+  label="在独立视图中打开语义向量"
+/>
+
+### 处理结果 · 结构树
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--processing-structure"
+  label="在独立视图中打开结构树"
+/>
+
+### 知识检索 · 空态
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--retrieval-empty"
+  label="在独立视图中打开检索空态"
+/>
+
+### 知识检索 · 结果
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--retrieval-results"
+  label="在独立视图中打开检索结果"
+/>
+
+### 知识检索 · 详情
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--retrieval-detail"
+  label="在独立视图中打开检索详情"
+/>
+
+### 结构树 · 全屏
+<StoryLink
+  storyId="pages-knowledgebase-knowledgebasedetailpage--structure-fullscreen"
+  label="在独立视图中打开全屏结构树"
+/>
+
+## 用法
+
+```tsx
+import {
+  KnowledgeBaseDetailPage,
+  KnowledgeOriginalContentView,
+} from '@agentos/design-system'
+
+<KnowledgeBaseDetailPage defaultContentTab="original">
+  <KnowledgeOriginalContentView />
+</KnowledgeBaseDetailPage>
+```
+
+## Props
+
+<Controls of={KnowledgeBaseDetailPageStories.OriginalContent} />
+
+## 相关 Token
+
+<TokenUsage id="knowledge-base-detail-page" color />

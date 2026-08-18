@@ -1,0 +1,49 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as TableStories from './Table.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={TableStories} />
+
+<ComponentMeta id="table" />
+
+## 概述
+
+表格以行列表格展示结构化数据，并支持排序、选中行、固定列与尺寸变体。
+
+## 示例
+
+### 默认
+基础数据表格：列定义与行数据。
+<Canvas of={TableStories.Default} />
+
+### 带边框
+单元格边框更清晰，适合密集数据。
+<Canvas of={TableStories.Bordered} />
+
+### 尺寸
+对比不同行高 / 字号的表格密度。
+<Canvas of={TableStories.Sizes} />
+
+### 可排序
+点击表头对列进行排序。
+<Canvas of={TableStories.Sortable} />
+
+### 选中行
+行选择与批量操作配合使用。
+<Canvas of={TableStories.SelectedRows} />
+
+## 用法
+
+```tsx
+import { Table } from '@agentos/design-system'
+
+<Table columns={columns} dataSource={data} />
+```
+
+## Props
+
+<Controls of={TableStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="table" color font />

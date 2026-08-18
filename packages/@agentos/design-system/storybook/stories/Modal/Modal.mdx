@@ -1,0 +1,68 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as ModalStories from './Modal.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={ModalStories} />
+
+<ComponentMeta id="modal" />
+
+## 概述
+
+对话框在阻塞层中展示聚焦内容或操作，支持信息 / 成功 / 警告 / 危险语义与多种尺寸。点击下方示例中的触发按钮可打开对话框。
+
+## 示例
+
+### 默认
+基础对话框：标题、内容与确认 / 取消。
+<Canvas of={ModalStories.Default} />
+
+### 信息
+信息语义，用于中性提示。
+<Canvas of={ModalStories.Info} />
+
+### 成功
+成功结果反馈对话框。
+<Canvas of={ModalStories.Success} />
+
+### 警告
+需要用户留意的警告确认。
+<Canvas of={ModalStories.Warning} />
+
+### 危险
+破坏性操作的高风险确认。
+<Canvas of={ModalStories.Danger} />
+
+### 大尺寸
+`size="lg"` 适合内容较多的表单或说明。
+<Canvas of={ModalStories.SizeLg} />
+
+### 长内容
+非全屏尺寸的最大高度会与视口上下边界各保留 `80px`，超出内容在正文区域滚动。
+<Canvas of={ModalStories.LongContent} />
+
+### 复合结构
+自定义页眉 / 页脚与内容区的组合用法。
+<Canvas of={ModalStories.Compound} />
+
+## 用法
+
+```tsx
+import { Modal, Button } from '@agentos/design-system'
+
+const [open, setOpen] = useState(false)
+
+<>
+  <Button onClick={() => setOpen(true)}>打开</Button>
+  <Modal open={open} onOpenChange={setOpen} title="提示">
+    内容
+  </Modal>
+</>
+```
+
+## Props
+
+<Controls of={ModalStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="modal" color font />

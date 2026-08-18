@@ -1,0 +1,41 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as CardStories from './Card.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={CardStories} />
+
+<ComponentMeta id="card" />
+
+## 概述
+
+卡片在灵活容器中展示分组内容，可附带标题、操作与选择控件。
+
+## 示例
+
+### 默认
+带标题与正文的标准卡片。
+<Canvas of={CardStories.Default} />
+
+### 标题带复选框
+标题区可勾选，用于批量选择卡片。
+<Canvas of={CardStories.WithCheckboxTitle} />
+
+### 极简
+去掉多余装饰，仅保留内容容器。
+<Canvas of={CardStories.Minimal} />
+
+## 用法
+
+```tsx
+import { Card } from '@agentos/design-system'
+
+<Card title="标题">卡片内容</Card>
+```
+
+## Props
+
+<Controls of={CardStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="card" color font />

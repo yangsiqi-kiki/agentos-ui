@@ -1,0 +1,49 @@
+import { Meta, Canvas, Controls } from '@storybook/blocks'
+import * as TitleStories from './Title.stories'
+import { ComponentMeta, TokenUsage } from '../docs/_layout'
+
+<Meta of={TitleStories} />
+
+<ComponentMeta id="title" />
+
+## 概述
+
+标题为章节与页面标题提供结构化标题样式，可附带前置元素与操作区。
+
+## 示例
+
+### 全部层级
+对比各 heading level 的字号与字重。
+<Canvas of={TitleStories.AllLevels} />
+
+### 默认
+基础标题样式。
+<Canvas of={TitleStories.Default} />
+
+### 带操作
+标题右侧附带按钮或链接操作。
+<Canvas of={TitleStories.WithAction} />
+
+### 带前置元素
+标题前放置图标或装饰。
+<Canvas of={TitleStories.WithLeading} />
+
+### 居中
+标题居中对齐，适合空态或引导页。
+<Canvas of={TitleStories.Centered} />
+
+## 用法
+
+```tsx
+import { Title } from '@agentos/design-system'
+
+<Title level={2} title="页面标题" />
+```
+
+## Props
+
+<Controls of={TitleStories.Default} />
+
+## 相关 Token
+
+<TokenUsage id="title" color font />

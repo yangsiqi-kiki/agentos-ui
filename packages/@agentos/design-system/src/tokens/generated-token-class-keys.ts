@@ -1,0 +1,96 @@
+/* 由 scripts/build-design-tokens.mjs 生成，请勿手改 */
+export const generatedTokenClassKeys = {
+  "fontFamily": [
+    "agentos-cn",
+    "agentos-en",
+    "agentos"
+  ],
+  "fontSize": [
+    "agentos-xs",
+    "agentos-sm",
+    "agentos-md",
+    "agentos-base",
+    "agentos-lg",
+    "agentos-xl",
+    "agentos-2xl",
+    "agentos-4xl",
+    "agentos-5xl",
+    "agentos-6xl"
+  ],
+  "fontWeight": [
+    "agentos-thin",
+    "agentos-extralight",
+    "agentos-light",
+    "agentos-normal",
+    "agentos-medium",
+    "agentos-semibold",
+    "agentos-bold",
+    "agentos-extrabold",
+    "agentos-black"
+  ],
+  "lineHeight": [
+    "agentos-14",
+    "agentos-18",
+    "agentos-20",
+    "agentos-22",
+    "agentos-24",
+    "agentos-28",
+    "agentos-32",
+    "agentos-36",
+    "agentos-40",
+    "agentos-48",
+    "agentos-56",
+    "agentos-64",
+    "agentos-72",
+    "agentos-96"
+  ],
+  "letterSpacing": [
+    "agentos-tighter",
+    "agentos-tight",
+    "agentos-normal",
+    "agentos-wide",
+    "agentos-wider",
+    "agentos-widest"
+  ],
+  "borderRadius": [
+    "agentos-rounded-none0",
+    "agentos-rounded-xs2",
+    "agentos-rounded-sm4",
+    "agentos-rounded-md6",
+    "agentos-rounded-lg8",
+    "agentos-rounded-xl12",
+    "agentos-rounded2-xl16",
+    "agentos-rounded3-xl24",
+    "agentos-rounded4-xl32",
+    "agentos-rounded-full999"
+  ],
+  "spacing": [
+    "agentos-margin-margin-xxs4",
+    "agentos-margin-margin-xs8",
+    "agentos-margin-margin-sm12",
+    "agentos-margin-margin16",
+    "agentos-margin-margin-md20",
+    "agentos-margin-margin-lg24",
+    "agentos-margin-margin-xl32",
+    "agentos-margin-margin-xxl48",
+    "agentos-padding-padding-xxs4",
+    "agentos-padding-padding-xs8",
+    "agentos-padding-padding-sm12",
+    "agentos-padding-padding16",
+    "agentos-padding-padding-md20",
+    "agentos-padding-padding-lg24",
+    "agentos-padding-padding-xl32",
+    "agentos-padding-padding6",
+    "agentos-gap-gap-xxs4",
+    "agentos-gap-gap-xs8",
+    "agentos-gap-gap-sm12",
+    "agentos-gap-gap16",
+    "agentos-control-control-height-sm24",
+    "agentos-control-control-height-md32",
+    "agentos-control-control-height-lg40",
+    "agentos-icon-icon-size-sm12",
+    "agentos-icon-icon-size-md16",
+    "agentos-icon-icon-size-lg20",
+    "agentos-icon-icon-size-xl24"
+  ]
+} as const

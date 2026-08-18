@@ -8,7 +8,7 @@ export function Topbar() {
       <div className="flex min-w-0 items-center gap-3">
         <div className="flex shrink-0 items-center gap-1.5">
           <img
-            src="/logo.png"
+            src={`${import.meta.env.BASE_URL}logo.png`}
             alt="Agent OS"
             className="size-8 shrink-0 object-contain"
           />

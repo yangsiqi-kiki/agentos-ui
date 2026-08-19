@@ -156,12 +156,20 @@ export const cancelLabel = '取消'
 export const deleteLabel = '删除'
 export const closeLabel = '关闭'
 export const selectAllLabel = '全选'
-export const copyLinkLabel = '创建链接并复制'
+export const shareImageLabel = '分享图片'
+export const shareImagePreviewTitle = '分享图片预览'
+export const shareImagePreviewDescription = '预览已选对话生成的分享图片，可复制或下载'
+export const copyImageLabel = '复制图片'
+export const downloadImageLabel = '下载图片'
+export const shareImageScanHint = '长按扫描二维码进入'
+export const copyLinkLabel = '分享链接'
 
 export function selectedConversationGroupsLabel(count: number) {
   return `已选 ${count} 组对话`
 }
 export const linkCopiedToast = '对话链接已复制'
+export const imageCopiedToast = '复制成功'
+export const imageCopyFailedToast = '复制失败，请稍后再试'
 export const deleteConfirmTitle = '是否删除该条消息'
 export const deleteConfirmDescription =
   '删除后，聊天记录不可恢复，对话内的文件也将被彻底删除'
@@ -171,6 +179,11 @@ export const sharedConversationPath = `/share/${sharedConversationId}`
 export const sharedConversationTitle = '框架协议验收与付款条款梳理'
 export const sharedConversationDate = '2026 年 8 月 18 日'
 export const sharedConversationDisclaimer = '内容由 AI 生成，不能完全保障真实'
+
+export function getShareImageDownloadName(title = sharedConversationTitle) {
+  const safeTitle = title.replace(/[\\/:*?"<>|]/g, '').trim()
+  return `agentos-${safeTitle}.png`
+}
 
 function withBasePath(pathname: string) {
   const base = import.meta.env.BASE_URL.replace(/\/$/, '')

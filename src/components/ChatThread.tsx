@@ -15,7 +15,7 @@ import { ChatSelectFooter } from './ChatSelectFooter'
 import { ChatSelectHeader } from './ChatSelectHeader'
 import { ChatShareFooter } from './ChatShareFooter'
 import { ChatThreadHeader } from './ChatThreadHeader'
-import { ChatToast } from './ChatToast'
+import { ChatToast, type ChatToastSemantic } from './ChatToast'
 import { MessageBubble } from './MessageBubble'
 
 type SelectionIntent = 'delete' | 'share'
@@ -61,7 +61,7 @@ export function ChatThread() {
   const [isRunning, setIsRunning] = useState(false)
   const [selectionIntent, setSelectionIntent] = useState<SelectionIntent | null>(null)
   const [selectedIds, setSelectedIds] = useState<string[]>([])
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [toast, setToast] = useState<{ message: string; semantic: ChatToastSemantic } | null>(null)
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const runRef = useRef<{ cancel: () => void } | null>(null)
   const savedScrollTopRef = useRef(0)
@@ -282,14 +282,18 @@ export function ChatThread() {
     exitSelectMode()
   }
 
+  const showToast = (message: string, semantic: ChatToastSemantic = 'success') => {
+    setToast({ message, semantic })
+    window.setTimeout(() => setToast(null), 3000)
+  }
+
   const copyShareLink = async () => {
     try {
       await navigator.clipboard.writeText(getSharedConversationUrl())
       exitSelectMode(true)
-      setToastMessage(linkCopiedToast)
-      window.setTimeout(() => setToastMessage(null), 3000)
+      showToast(linkCopiedToast)
     } catch {
-      setToastMessage(null)
+      setToast(null)
     }
   }
 
@@ -350,11 +354,13 @@ export function ChatThread() {
         <ChatShareFooter
           selectAllState={selectAllState}
           selectedGroupCount={countSelectedGroups(messages, selectedIds)}
+          messages={messages.filter((message) => selectedIds.includes(message.id))}
           copyDisabled={selectedIds.length === 0}
           onToggleAll={toggleSelectAll}
           onCopyLink={() => {
             void copyShareLink()
           }}
+          onToast={showToast}
         />
       ) : (
         <ChatComposer
@@ -365,8 +371,8 @@ export function ChatThread() {
           onStop={stopRun}
         />
       )}
-      {toastMessage ? (
-        <ChatToast message={toastMessage} onClose={() => setToastMessage(null)} />
+      {toast ? (
+        <ChatToast message={toast.message} semantic={toast.semantic} />
       ) : null}
     </div>
   )

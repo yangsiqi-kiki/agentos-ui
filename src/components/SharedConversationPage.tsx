@@ -68,7 +68,7 @@ export function SharedConversationPage() {
           <h1 className="text-agentos-2xl font-agentos-semibold leading-agentos-32 text-agentos-neutral-text-color-text-heading">
             {sharedConversationTitle}
           </h1>
-          <div className="flex items-center gap-agentos-gap-gap-xs8 text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text-description">
+          <div className="flex items-center gap-agentos-gap-gap-xs8 text-agentos-sm leading-4 text-agentos-neutral-text-color-text-description">
             <p>{sharedConversationDate}</p>
             <span
               aria-hidden="true"

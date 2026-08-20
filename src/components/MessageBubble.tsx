@@ -260,7 +260,7 @@ function MessageActions({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="start"
-              className="w-[200px] min-w-[200px] p-0 py-agentos-padding-padding-xxs4 shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
+              className="flex w-[200px] min-w-[200px] flex-col gap-agentos-gap-gap-xxs4 p-agentos-padding-padding-xxs4 shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
               onOpenAutoFocus={(event) => {
                 event.preventDefault()
                 requestAnimationFrame(() => {
@@ -269,7 +269,7 @@ function MessageActions({
               }}
               onCloseAutoFocus={(event) => event.preventDefault()}
             >
-              <div className="flex items-center gap-agentos-gap-gap-xs8 px-agentos-padding-padding-sm12 py-[7px]">
+              <div className="flex w-full items-center gap-agentos-gap-gap-xs8 px-agentos-padding-padding-xs8 py-[7px]">
                 <input
                   ref={retryInputRef}
                   value={retryPrompt}
@@ -298,8 +298,11 @@ function MessageActions({
                   <ArrowUp className="size-agentos-icon-icon-size-sm12" />
                 </button>
               </div>
-              <DropdownMenuSeparator className="my-0" />
-              <DropdownMenuItem onSelect={() => submitRetry()}>
+              <DropdownMenuSeparator className="mx-agentos-padding-padding-xxs4 my-0" />
+              <DropdownMenuItem
+                className="rounded-agentos-rounded-md6 px-agentos-padding-padding-xs8 leading-agentos-22"
+                onSelect={() => submitRetry()}
+              >
                 <RefreshCw aria-hidden="true" />
                 {regenerateLabel}
               </DropdownMenuItem>
@@ -314,10 +317,11 @@ function MessageActions({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align={align}
+            className="p-agentos-padding-padding-xxs4 shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
             onCloseAutoFocus={(event) => event.preventDefault()}
           >
             <DropdownMenuItem
-              className="text-agentos-brand-error-color-error"
+              className="rounded-agentos-rounded-md6 px-agentos-padding-padding-xs8 leading-agentos-22 text-agentos-brand-error-color-error"
               onSelect={onDelete}
             >
               <Trash2 aria-hidden="true" />

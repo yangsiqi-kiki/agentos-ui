@@ -2,6 +2,7 @@ import { Button, Checkbox, type CheckboxState } from '@agentos/design-system'
 import { useState } from 'react'
 
 import {
+  cancelLabel,
   copyLinkLabel,
   selectAllLabel,
   selectedConversationGroupsLabel,
@@ -16,6 +17,7 @@ export function ChatShareFooter({
   messages,
   copyDisabled,
   onToggleAll,
+  onCancel,
   onCopyLink,
   onToast,
 }: {
@@ -24,6 +26,7 @@ export function ChatShareFooter({
   messages: ChatMessage[]
   copyDisabled?: boolean
   onToggleAll: (nextSelected: boolean) => void
+  onCancel: () => void
   onCopyLink: () => void
   onToast: (message: string, semantic: 'success' | 'error') => void
 }) {
@@ -48,6 +51,17 @@ export function ChatShareFooter({
           theme="black"
           appearance="outline"
           size="default"
+          className="w-[76px] border-transparent bg-agentos-neutral-fill-color-fill-secondary hover:border-transparent hover:bg-agentos-neutral-fill-color-fill"
+          onClick={onCancel}
+        >
+          {cancelLabel}
+        </Button>
+        <Button
+          type="button"
+          theme="black"
+          appearance="outline"
+          size="default"
+          className="w-[76px] border-transparent bg-agentos-neutral-fill-color-fill-secondary hover:border-transparent hover:bg-agentos-neutral-fill-color-fill disabled:border-transparent"
           disabled={copyDisabled}
           onClick={() => setPreviewOpen(true)}
         >
@@ -58,6 +72,7 @@ export function ChatShareFooter({
           theme="primary"
           appearance="solid"
           size="default"
+          className="w-[76px]"
           disabled={copyDisabled}
           onClick={onCopyLink}
         >

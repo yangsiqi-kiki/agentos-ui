@@ -16,12 +16,14 @@ export function ChatSelectFooter({
   selectedGroupCount,
   disabled,
   onToggleAll,
+  onCancel,
   onDelete,
 }: {
   selectAllState: CheckboxState
   selectedGroupCount: number
   disabled?: boolean
   onToggleAll: (nextSelected: boolean) => void
+  onCancel: () => void
   onDelete: () => void
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -39,16 +41,29 @@ export function ChatSelectFooter({
           {selectedConversationGroupsLabel(selectedGroupCount)}
         </span>
       </div>
-      <Button
-        type="button"
-        theme="danger"
-        appearance="solid"
-        size="default"
-        disabled={disabled}
-        onClick={() => setConfirmOpen(true)}
-      >
-        {deleteLabel}
-      </Button>
+      <div className="flex shrink-0 items-center gap-agentos-gap-gap-xs8">
+        <Button
+          type="button"
+          theme="black"
+          appearance="outline"
+          size="default"
+          className="w-[76px] border-transparent bg-agentos-neutral-fill-color-fill-secondary hover:border-transparent hover:bg-agentos-neutral-fill-color-fill"
+          onClick={onCancel}
+        >
+          {cancelLabel}
+        </Button>
+        <Button
+          type="button"
+          theme="danger"
+          appearance="solid"
+          size="default"
+          className="w-[76px]"
+          disabled={disabled}
+          onClick={() => setConfirmOpen(true)}
+        >
+          {deleteLabel}
+        </Button>
+      </div>
       <InformationModal
         open={confirmOpen}
         onOpenChange={setConfirmOpen}

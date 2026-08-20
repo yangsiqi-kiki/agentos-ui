@@ -306,7 +306,7 @@ export function ChatThread() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      {isSelecting ? <ChatSelectHeader onCancel={() => exitSelectMode(true)} /> : <ChatThreadHeader />}
+      {isSelecting ? <ChatSelectHeader /> : <ChatThreadHeader />}
       <div
         ref={viewportRef}
         className="min-h-0 flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-agentos-padding-padding-lg24 py-agentos-padding-padding16"
@@ -331,7 +331,6 @@ export function ChatThread() {
                 showShare={!isRunning}
                 selecting={isSelecting}
                 selected={selectedIds.includes(message.id)}
-                highlightSelectedOnly={selectionIntent !== 'share'}
                 onDelete={() => enterSelectMode(message.id, 'delete')}
                 onShare={() => enterSelectMode(message.id, 'share')}
                 onRetry={(prompt?: string) => regenerateMessage(message.id, prompt)}
@@ -348,6 +347,7 @@ export function ChatThread() {
           selectedGroupCount={countSelectedGroups(messages, selectedIds)}
           disabled={selectedIds.length === 0}
           onToggleAll={toggleSelectAll}
+          onCancel={() => exitSelectMode(true)}
           onDelete={deleteSelected}
         />
       ) : selectionIntent === 'share' ? (
@@ -357,6 +357,7 @@ export function ChatThread() {
           messages={messages.filter((message) => selectedIds.includes(message.id))}
           copyDisabled={selectedIds.length === 0}
           onToggleAll={toggleSelectAll}
+          onCancel={() => exitSelectMode(true)}
           onCopyLink={() => {
             void copyShareLink()
           }}

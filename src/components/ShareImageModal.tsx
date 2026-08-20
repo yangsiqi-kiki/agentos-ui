@@ -10,6 +10,7 @@ import {
   ModalTitle,
 } from '@agentos/design-system'
 import { toBlob } from 'html-to-image'
+import { Copy, Download } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import {
@@ -115,27 +116,30 @@ export function ShareImageModal({
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent
-        size="lg"
-        className="max-h-[min(640px,calc(100dvh-160px))] w-[min(900px,calc(100vw-160px))] duration-0 data-[state=open]:!animate-none data-[state=closed]:!animate-none"
+        className="h-[min(640px,calc(100dvh-160px))] w-[min(640px,calc(100vw-32px))] gap-agentos-gap-gap16 rounded-agentos-rounded2-xl16 bg-agentos-neutral-bg-color-bg-container px-agentos-padding-padding-md20 py-agentos-padding-padding16 duration-0 data-[state=open]:!animate-none data-[state=closed]:!animate-none"
       >
-        <ModalHeader>
-          <ModalTitle>{shareImagePreviewTitle}</ModalTitle>
+        <ModalHeader className="border-b-0 px-0 py-0">
+          <ModalTitle className="font-agentos-cn font-agentos-medium">
+            {shareImagePreviewTitle}
+          </ModalTitle>
           <ModalCloseButton closeLabel={closeLabel} />
         </ModalHeader>
         <ModalDescription className="sr-only">{shareImagePreviewDescription}</ModalDescription>
-        <ModalBody className="block min-h-0">
-          <div className="h-auto rounded-agentos-rounded-xl12 bg-agentos-neutral-fill-color-fill-tertiary p-agentos-padding-padding-xs8">
+        <ModalBody className="min-h-0 px-0 py-0">
+          <div className="w-full rounded-agentos-rounded-xl12 bg-agentos-neutral-fill-color-fill-tertiary p-agentos-padding-padding-xs8">
             <ShareImageCard ref={cardRef} messages={messages} />
           </div>
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="h-auto items-center border-t-0 px-0 py-0">
           <div className="flex items-center gap-agentos-gap-gap-xs8">
             <Button
               type="button"
               theme="black"
               appearance="outline"
               size="default"
+              className="border-transparent bg-agentos-neutral-fill-color-fill-secondary px-agentos-padding-padding-sm12 hover:border-transparent hover:bg-agentos-neutral-fill-color-fill disabled:border-transparent"
               disabled={busy}
+              leadingIcon={<Copy aria-hidden="true" />}
               onClick={() => {
                 void copyImage()
               }}
@@ -144,10 +148,12 @@ export function ShareImageModal({
             </Button>
             <Button
               type="button"
-              theme="black"
+              theme="primary"
               appearance="solid"
               size="default"
+              className="px-agentos-padding-padding-sm12"
               disabled={busy}
+              leadingIcon={<Download aria-hidden="true" />}
               onClick={() => {
                 void downloadImage()
               }}

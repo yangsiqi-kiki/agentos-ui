@@ -32,7 +32,7 @@ function ShareCardMessage({ message }: { message: ChatMessage }) {
   if (message.role === 'user') {
     return (
       <div className="flex w-full items-center justify-end rounded-agentos-rounded-xl12 pt-agentos-margin-margin-sm12 pb-agentos-margin-margin-lg24">
-        <div className="max-w-[600px] rounded-agentos-rounded-lg8 bg-agentos-brand-primary-color-primary-bg p-agentos-padding-padding-sm12">
+        <div className="max-w-[600px] rounded-agentos-rounded-lg8 bg-agentos-neutral-fill-color-fill-tertiary p-agentos-padding-padding-sm12">
           <p className="whitespace-pre-wrap break-words text-agentos-base leading-agentos-20 text-agentos-neutral-text-color-text-heading">
             {message.content}
           </p>
@@ -42,13 +42,9 @@ function ShareCardMessage({ message }: { message: ChatMessage }) {
   }
 
   return (
-    <div className="flex w-full flex-col items-start pt-agentos-margin-margin-sm12 pb-agentos-margin-margin-lg24">
-      <div className="flex w-full items-center gap-agentos-gap-gap-sm12 rounded-agentos-rounded-xl12 bg-agentos-neutral-bg-color-bg-elevated px-agentos-padding-padding-sm12 py-agentos-margin-margin-sm12">
-        <div className="flex min-w-0 flex-col items-start gap-agentos-gap-gap-xs8">
-          <ShareAgentIdentity />
-          <MarkdownContent content={message.content} size="base" />
-        </div>
-      </div>
+    <div className="flex w-full flex-col items-start gap-agentos-gap-gap-xs8 pt-agentos-margin-margin-sm12 pb-agentos-margin-margin-lg24">
+      <ShareAgentIdentity />
+      <MarkdownContent content={message.content} size="base" />
     </div>
   )
 }
@@ -82,28 +78,31 @@ export const ShareImageCard = forwardRef<HTMLDivElement, { messages: ChatMessage
           {messages.map((message) => (
             <ShareCardMessage key={message.id} message={message} />
           ))}
-        </div>
-        <div className="h-[0.5px] w-full bg-agentos-neutral-fill-color-fill" />
-        <div className="flex w-full items-center justify-between py-agentos-padding-padding-xl32">
-          <div className="flex flex-col items-start gap-agentos-gap-gap-xxs4">
-            <div className="flex items-center gap-agentos-gap-gap-xs8 overflow-hidden px-0.5 py-1.5">
+          <div className="flex w-full items-center justify-between rounded-agentos-rounded2-xl16 bg-agentos-neutral-fill-color-fill-tertiary p-agentos-padding-padding-md20">
+            <div className="flex flex-col items-start gap-agentos-gap-gap-xxs4">
+              <div className="flex items-center gap-agentos-gap-gap-xs8 overflow-hidden px-0.5 py-1.5">
+                <img
+                  alt=""
+                  src={agentosLogo}
+                  className="size-[24px] shrink-0 overflow-clip object-cover mix-blend-multiply"
+                />
+                <img
+                  alt="AgentOS"
+                  src={agentosWordmark}
+                  className="h-[14.436px] w-[72.352px] shrink-0"
+                />
+              </div>
+              <p className="text-agentos-sm leading-4 text-agentos-neutral-text-color-text-description">
+                {shareImageScanHint}
+              </p>
+            </div>
+            <div className="relative size-[60px] shrink-0 overflow-clip">
               <img
                 alt=""
-                src={agentosLogo}
-                className="size-[24px] shrink-0 overflow-clip object-cover"
-              />
-              <img
-                alt="AgentOS"
-                src={agentosWordmark}
-                className="h-[14.436px] w-[72.352px] shrink-0"
+                src={shareQrCode}
+                className="size-full object-cover"
               />
             </div>
-            <p className="text-agentos-sm leading-4 text-agentos-neutral-text-color-text-description">
-              {shareImageScanHint}
-            </p>
-          </div>
-          <div className="relative size-[60px] shrink-0 overflow-clip">
-            <img alt="" src={shareQrCode} className="size-full object-cover" />
           </div>
         </div>
       </div>

@@ -174,6 +174,8 @@ export const deleteConfirmTitle = '是否删除该条消息'
 export const deleteConfirmDescription =
   '删除后，聊天记录不可恢复，对话内的文件也将被彻底删除'
 
+export const startBuildingLabel = '开始打造'
+export const agentOsHomeUrl = 'https://agentos-dev.inspiregroup.me/'
 export const sharedConversationId = 'demo-conversation'
 export const sharedConversationPath = `/share/${sharedConversationId}`
 export const sharedConversationTitle = '框架协议验收与付款条款梳理'

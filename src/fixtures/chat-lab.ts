@@ -21,6 +21,7 @@ export const stages: Array<{ key: StageKey; index: string; label: string }> = [
 ]
 
 export const spaceName = '演示空间'
+export const currentSpaceId = 'demo-space'
 export const scenarioName = '合同审查助手'
 export const productName = '智能空间'
 export const productVersion = 'v1.1.0'

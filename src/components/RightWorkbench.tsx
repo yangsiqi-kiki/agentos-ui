@@ -11,6 +11,7 @@ import {
 import { useMemo, useState, type ReactNode } from 'react'
 
 import { OverviewPanel } from './OverviewPanel'
+import { OntologyWorkbenchPanel } from './ontology-demo/OntologyWorkbenchPanel'
 import { WorkbenchTabsBar } from './WorkbenchTabsBar'
 
 const tabIconClass = '!size-3 shrink-0'
@@ -41,8 +42,8 @@ const resourceTabMap: Record<string, string> = {
   'memory-bank': 'memory',
 }
 
-export function RightWorkbench() {
-  const [activeTab, setActiveTab] = useState('all')
+export function RightWorkbench({ initialTab = 'all' }: { initialTab?: string }) {
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [openTabValues, setOpenTabValues] = useState(() => allTabs.map((tab) => tab.value))
 
   const tabs = useMemo(
@@ -71,12 +72,16 @@ export function RightWorkbench() {
           if (activeTab === value) setActiveTab('all')
         }}
       />
-      <OverviewPanel
-        onOpenResource={(resourceKey) => {
-          const tabValue = resourceTabMap[resourceKey]
-          if (tabValue) openTab(tabValue)
-        }}
-      />
+      {activeTab === 'ontology' ? (
+        <OntologyWorkbenchPanel />
+      ) : (
+        <OverviewPanel
+          onOpenResource={(resourceKey) => {
+            const tabValue = resourceTabMap[resourceKey]
+            if (tabValue) openTab(tabValue)
+          }}
+        />
+      )}
     </div>
   )
 }

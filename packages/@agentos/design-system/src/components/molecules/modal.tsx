@@ -105,17 +105,19 @@ const modalContentVariants = cva(
 
 export interface ModalContentProps
   extends ComponentPropsWithoutRef<typeof DialogPrimitive.Content>,
-    VariantProps<typeof modalContentVariants> {}
+    VariantProps<typeof modalContentVariants> {
+  overlayClassName?: string
+}
 
 const ModalContent = forwardRef<
   ElementRef<typeof DialogPrimitive.Content>,
   ModalContentProps
->(({ className, size = 'sm', children, onEscapeKeyDown, onInteractOutside, ...props }, ref) => {
+>(({ className, overlayClassName, size = 'sm', children, onEscapeKeyDown, onInteractOutside, ...props }, ref) => {
   const { maskClosable, escToExit } = useContext(ModalDismissContext)
 
   return (
     <ModalPortal>
-      <ModalOverlay />
+      <ModalOverlay className={overlayClassName} />
       <DialogPrimitive.Content
         ref={ref}
         className={cn(modalContentVariants({ size }), className)}

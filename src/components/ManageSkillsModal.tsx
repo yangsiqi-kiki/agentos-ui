@@ -593,7 +593,7 @@ function SpaceStatusButton({
         'px-agentos-padding-padding6 text-agentos-sm leading-[16px]',
         'hover:bg-agentos-neutral-fill-color-fill-secondary',
         active
-          ? 'text-agentos-brand-success-color-success-active'
+          ? 'text-agentos-brand-primary-color-primary'
           : 'text-agentos-neutral-text-color-text-quaternary',
       )}
     >

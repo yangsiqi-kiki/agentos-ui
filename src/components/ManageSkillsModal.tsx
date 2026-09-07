@@ -61,6 +61,7 @@ export type CustomSkill = {
   spaceAction: 'add' | 'added' | 'shared'
   spaceActionLabel: string
   shared: boolean
+  sharedSpaceIds?: string[]
 }
 
 const collapsedOfficialSkills: OfficialSkill[] = [
@@ -158,6 +159,7 @@ export const createdSkills: CustomSkill[] = [
     spaceAction: 'shared',
     spaceActionLabel: '2 个空间已添加、1 个空间已共享',
     shared: true,
+    sharedSpaceIds: [currentSpaceId, 'executives', 'dji-qa', 'llm-test-deepseek'],
   },
   {
     id: 'minutes-extract-2',
@@ -210,6 +212,7 @@ export const createdSkills: CustomSkill[] = [
     spaceAction: 'shared',
     spaceActionLabel: '2 个空间已添加、1 个空间已共享',
     shared: true,
+    sharedSpaceIds: ['executives', 'llm-test-minimax', 'llm-test-qwen', 'llm-test-glm'],
   },
   {
     id: 'minutes-extract-3',
@@ -262,6 +265,7 @@ export const createdSkills: CustomSkill[] = [
     spaceAction: 'shared',
     spaceActionLabel: '2 个空间已添加、1 个空间已共享',
     shared: true,
+    sharedSpaceIds: [currentSpaceId, 'dji-qa', 'llm-test-kimi-k2.7'],
   },
 ]
 
@@ -300,6 +304,13 @@ function emptySpaceAssignments(): Record<string, SpaceAssignment> {
   )
 }
 
+function getSkillMenuSpaces(skill: CustomSkill, allowShare: boolean) {
+  if (allowShare || !skill.sharedSpaceIds?.length) {
+    return skillSpaceOptions
+  }
+  return skillSpaceOptions.filter((space) => skill.sharedSpaceIds?.includes(space.id))
+}
+
 export function createSpaceAssignments(skill: CustomSkill): Record<string, SpaceAssignment> {
   const next = emptySpaceAssignments()
   if (skill.spaceAction === 'added') {
@@ -310,8 +321,14 @@ export function createSpaceAssignments(skill: CustomSkill): Record<string, Space
     return next
   }
   if (skill.spaceAction === 'shared') {
-    next.executives = { added: true, shared: false }
-    next['dji-qa'] = { added: true, shared: true }
+    const sharedSpaces = skill.sharedSpaceIds ?? []
+    sharedSpaces.forEach((spaceId, index) => {
+      if (index === 0) {
+        next[spaceId] = { added: true, shared: false }
+      } else if (index === 1) {
+        next[spaceId] = { added: true, shared: true }
+      }
+    })
     return next
   }
   return next
@@ -326,11 +343,11 @@ export function createInitialSkillAssignments() {
 function summarizeSpaceAssignments(
   assignments: Record<string, SpaceAssignment>,
   allowShare = true,
+  spaceIds?: readonly string[],
 ) {
-  const added = Object.values(assignments).filter((space) => space.added).length
-  const shared = allowShare
-    ? Object.values(assignments).filter((space) => space.shared).length
-    : 0
+  const ids = spaceIds ?? Object.keys(assignments)
+  const added = ids.filter((id) => assignments[id]?.added).length
+  const shared = allowShare ? ids.filter((id) => assignments[id]?.shared).length : 0
   if (added === 0 && shared === 0) {
     return { label: '添加空间使用', empty: true }
   }
@@ -503,24 +520,29 @@ function OfficialSkillCard({ skill }: { skill: OfficialSkill }) {
 
 function SkillSpaceMenu({
   allowShare,
+  spaces,
   assignments,
   onAssignmentsChange,
 }: {
   allowShare: boolean
+  spaces: readonly { id: string; name: string }[]
   assignments: Record<string, SpaceAssignment>
   onAssignmentsChange: Dispatch<SetStateAction<Record<string, SpaceAssignment>>>
 }) {
-  const summary = summarizeSpaceAssignments(assignments, allowShare)
-  const addedCount = Object.values(assignments).filter((space) => space.added).length
+  const spaceIds = spaces.map((space) => space.id)
+  const summary = summarizeSpaceAssignments(assignments, allowShare, spaceIds)
+  const addedCount = spaceIds.filter((id) => assignments[id]?.added).length
   const allChecked: CheckboxState =
-    addedCount === 0 ? false : addedCount === skillSpaceOptions.length ? true : 'indeterminate'
+    addedCount === 0 ? false : addedCount === spaces.length ? true : 'indeterminate'
 
   const setAllAdded = (added: boolean) => {
-    onAssignmentsChange((current) =>
-      Object.fromEntries(
-        Object.entries(current).map(([id, space]) => [id, { ...space, added }]),
-      ),
-    )
+    onAssignmentsChange((current) => {
+      const next = { ...current }
+      for (const space of spaces) {
+        next[space.id] = { added, shared: current[space.id]?.shared ?? false }
+      }
+      return next
+    })
   }
 
   const setSpaceAdded = (id: string, added: boolean) => {
@@ -578,7 +600,7 @@ function SkillSpaceMenu({
               onCheckedChange={(checked) => setAllAdded(checked === true)}
             />
           </div>
-          {skillSpaceOptions.map((space) => {
+          {spaces.map((space) => {
             const assignment = assignments[space.id] ?? { added: false, shared: false }
             return (
               <div
@@ -792,6 +814,7 @@ function CustomSkillCard({
   assignments: Record<string, SpaceAssignment>
   onAssignmentsChange: Dispatch<SetStateAction<Record<string, SpaceAssignment>>>
 }) {
+  const menuSpaces = getSkillMenuSpaces(skill, allowShare)
   const scoped = filteredSpaceId
     ? (assignments[filteredSpaceId] ?? { added: false, shared: false })
     : null
@@ -879,6 +902,7 @@ function CustomSkillCard({
       ) : (
         <SkillSpaceMenu
           allowShare={allowShare}
+          spaces={menuSpaces}
           assignments={assignments}
           onAssignmentsChange={onAssignmentsChange}
         />
@@ -1006,10 +1030,13 @@ export function ManageSkillsModal({
 
   const filteredSpaceId = space === 'all' ? null : space
 
-  const customSkills = useMemo(
-    () => (tab === 'shared' ? createdSkills.filter((skill) => skill.shared) : createdSkills),
-    [tab],
-  )
+  const customSkills = useMemo(() => {
+    const list = tab === 'shared' ? createdSkills.filter((skill) => skill.shared) : createdSkills
+    if (tab !== 'shared' || !filteredSpaceId) {
+      return list
+    }
+    return list.filter((skill) => skill.sharedSpaceIds?.includes(filteredSpaceId))
+  }, [tab, filteredSpaceId])
 
   return (
     <Modal open={open} onOpenChange={onOpenChange}>

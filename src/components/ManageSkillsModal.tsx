@@ -1012,8 +1012,8 @@ export function ManageSkillsModal({
             </button>
           </section>
 
-          <section className="flex w-full flex-col gap-3">
-            <div className="flex h-8 items-center gap-3">
+          <section className="flex min-h-0 w-full flex-1 flex-col gap-3">
+            <div className="flex h-8 shrink-0 items-center gap-3">
               <div className="flex min-w-0 flex-1 items-center gap-3">
                 <button
                   type="button"
@@ -1108,22 +1108,28 @@ export function ManageSkillsModal({
                 }}
               />
             </div>
-            <div className="grid grid-cols-2 items-stretch gap-3 min-[960px]:grid-cols-3">
-              {customSkills.map((skill) => (
-                <CustomSkillCard
-                  key={skill.id}
-                  skill={tab === 'shared' ? { ...skill, author: 'Mark Lee' } : skill}
-                  allowShare={tab === 'created'}
-                  assignments={skillAssignments[skill.id] ?? createSpaceAssignments(skill)}
-                  onAssignmentsChange={(updater) => onSkillAssignmentsChange(skill.id, updater)}
-                  onReupload={() => {
-                    reuploadSkillIdRef.current = skill.id
-                    uploadInputRef.current?.click()
-                  }}
-                  onDelete={() => setSkillToDelete(skill.id)}
-                />
-              ))}
-            </div>
+            {customSkills.length === 0 ? (
+              <div className="flex min-h-0 flex-1 items-center justify-center text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text-tertiary">
+                暂无技能
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 items-stretch gap-3 min-[960px]:grid-cols-3">
+                {customSkills.map((skill) => (
+                  <CustomSkillCard
+                    key={skill.id}
+                    skill={tab === 'shared' ? { ...skill, author: 'Mark Lee' } : skill}
+                    allowShare={tab === 'created'}
+                    assignments={skillAssignments[skill.id] ?? createSpaceAssignments(skill)}
+                    onAssignmentsChange={(updater) => onSkillAssignmentsChange(skill.id, updater)}
+                    onReupload={() => {
+                      reuploadSkillIdRef.current = skill.id
+                      uploadInputRef.current?.click()
+                    }}
+                    onDelete={() => setSkillToDelete(skill.id)}
+                  />
+                ))}
+              </div>
+            )}
           </section>
         </ModalBody>
       </ModalContent>

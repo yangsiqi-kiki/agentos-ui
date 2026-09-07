@@ -5,7 +5,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode }
 import { composerPlaceholder, currentSpaceId } from '../fixtures/chat-lab'
 import {
   createdSkills,
+  createCurrentSpaceOnlyAssignments,
   createInitialSkillAssignments,
+  createUploadedSkill,
   ManageSkillsModal,
   type CustomSkill,
   type SpaceAssignment,
@@ -118,14 +120,29 @@ export function ChatComposer({
   const [manageOpen, setManageOpen] = useState(false)
   const [manageInitialSpace, setManageInitialSpace] = useState('all')
   const [skillAssignments, setSkillAssignments] = useState(createInitialSkillAssignments)
+  const [extraSkills, setExtraSkills] = useState<CustomSkill[]>([])
+  const [hiddenSkillIds, setHiddenSkillIds] = useState<string[]>([])
   const [anchor, setAnchor] = useState<{ left: number; width: number; top: number } | null>(null)
+
+  const allCreatedSkills = useMemo(
+    () => {
+      const hidden = new Set(hiddenSkillIds)
+      const extraIds = new Set(extraSkills.map((skill) => skill.id))
+      return [
+        ...extraSkills.filter((skill) => !hidden.has(skill.id)),
+        ...createdSkills.filter((skill) => !hidden.has(skill.id) && !extraIds.has(skill.id)),
+      ]
+    },
+    [extraSkills, hiddenSkillIds],
+  )
 
   const customSlashItems = useMemo(
     () =>
-      createdSkills
+      allCreatedSkills
+        .filter((skill) => skill.uploadStatus !== 'uploading')
         .filter((skill) => skillAssignments[skill.id]?.[currentSpaceId]?.added)
         .map((skill) => toSlashCustomItem(skill, skillAssignments[skill.id]?.[currentSpaceId])),
-    [skillAssignments],
+    [allCreatedSkills, skillAssignments],
   )
   const knownSkillCommands = useMemo(
     () => getKnownSkillCommands(customSlashItems),
@@ -214,11 +231,11 @@ export function ChatComposer({
     if (!slashToken) {
       return
     }
-    if (item.action === 'manage' || item.action === 'add') {
+    if (item.action === 'manage') {
       const next = `${value.slice(0, slashToken.start)}${value.slice(slashToken.end)}`
       onChange(next)
       setDismissed(true)
-      setManageInitialSpace(item.action === 'add' ? currentSpaceId : 'all')
+      setManageInitialSpace('all')
       setManageOpen(true)
       return
     }
@@ -377,6 +394,8 @@ export function ChatComposer({
         open={manageOpen}
         initialSpace={manageInitialSpace}
         skillAssignments={skillAssignments}
+        extraSkills={extraSkills}
+        hiddenSkillIds={hiddenSkillIds}
         onSkillAssignmentsChange={(skillId, updater) => {
           setSkillAssignments((current) => {
             const previous = current[skillId] ?? {}
@@ -396,6 +415,53 @@ export function ChatComposer({
             }
             textarea.focus()
             textarea.setSelectionRange('/workshop-skill-creator '.length, '/workshop-skill-creator '.length)
+          })
+        }}
+        onUploadSkill={(file) => {
+          const skill = createUploadedSkill(file)
+          setExtraSkills((current) => [skill, ...current])
+          setSkillAssignments((current) => ({
+            ...current,
+            [skill.id]: createCurrentSpaceOnlyAssignments(),
+          }))
+          window.setTimeout(() => {
+            setExtraSkills((current) =>
+              current.map((item) =>
+                item.id === skill.id ? { ...item, uploadStatus: 'ready' } : item,
+              ),
+            )
+          }, 1400)
+        }}
+        onReuploadSkill={(skillId, file) => {
+          const uploaded = { ...createUploadedSkill(file), id: skillId }
+          setExtraSkills((current) => {
+            const exists = current.some((skill) => skill.id === skillId)
+            if (exists) {
+              return current.map((skill) => (skill.id === skillId ? uploaded : skill))
+            }
+            return [uploaded, ...current]
+          })
+          setSkillAssignments((current) => ({
+            ...current,
+            [skillId]: current[skillId] ?? createCurrentSpaceOnlyAssignments(),
+          }))
+          window.setTimeout(() => {
+            setExtraSkills((current) =>
+              current.map((item) =>
+                item.id === skillId ? { ...item, uploadStatus: 'ready' } : item,
+              ),
+            )
+          }, 1400)
+        }}
+        onDeleteSkill={(skillId) => {
+          setHiddenSkillIds((current) =>
+            current.includes(skillId) ? current : [...current, skillId],
+          )
+          setExtraSkills((current) => current.filter((skill) => skill.id !== skillId))
+          setSkillAssignments((current) => {
+            const next = { ...current }
+            delete next[skillId]
+            return next
           })
         }}
       />

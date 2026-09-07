@@ -1,5 +1,5 @@
 import { Tag, cn } from '@agentos/design-system'
-import { MessageCircleMore, Plus, Settings } from 'lucide-react'
+import { MessageCircleMore, Settings } from 'lucide-react'
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -11,8 +11,8 @@ export type SlashMenuItem = {
   label: string
   description: string
   insertValue: string
-  action?: 'insert' | 'manage' | 'add'
-  icon?: 'settings' | 'plus' | 'message'
+  action?: 'insert' | 'manage'
+  icon?: 'settings' | 'message'
   command?: string
   tags?: Array<{ label: string; tone: SlashTagTone }>
 }
@@ -36,15 +36,6 @@ const staticSlashSections: SlashSection[] = [
         description: '管理我的自定义技能',
         insertValue: '',
         action: 'manage',
-      },
-      {
-        id: 'add-skill',
-        kind: 'action',
-        icon: 'plus',
-        label: '添加技能',
-        description: '添加我创建的或他人共享的自定义技能至当前空间',
-        insertValue: '',
-        action: 'add',
       },
       {
         id: 'create-skill',
@@ -117,7 +108,6 @@ export function getSlashSections(customItems: SlashMenuItem[] = []): SlashSectio
 
 const iconMap = {
   settings: Settings,
-  plus: Plus,
   message: MessageCircleMore,
 } as const
 

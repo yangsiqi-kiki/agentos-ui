@@ -1,7 +1,10 @@
 import {
   Button,
-  Checkbox,
-  Divider,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  InformationModal,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -12,11 +15,8 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  Switch,
   Tag,
-  UploadTrigger,
   cn,
-  type CheckboxState,
 } from '@agentos/design-system'
 import {
   Check,
@@ -24,16 +24,22 @@ import {
   ChevronRight,
   Clock9,
   Ellipsis,
+  Eye,
+  EyeOff,
+  LoaderCircle,
   Lock,
+  LockOpen,
   MessageCircleMore,
-  Plus,
+  Pencil,
+  RefreshCw,
+  Trash2,
+  Upload,
   UserRound,
   Wrench,
-  X,
 } from 'lucide-react'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type Dispatch, type SetStateAction } from 'react'
 
-import { closeLabel, currentSpaceId, spaceName } from '../fixtures/chat-lab'
+import { cancelLabel, closeLabel, currentSpaceId, deleteLabel, spaceName } from '../fixtures/chat-lab'
 
 const skillDescription =
   '连接对象模型与数据源元数据，扫描对象、关系与字段映射的一致性，辅助排查建模缺口'
@@ -62,6 +68,7 @@ export type CustomSkill = {
   spaceActionLabel: string
   shared: boolean
   sharedSpaceIds?: string[]
+  uploadStatus?: 'uploading' | 'ready'
 }
 
 const collapsedOfficialSkills: OfficialSkill[] = [
@@ -139,7 +146,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'add',
-    spaceActionLabel: '添加空间使用',
+    spaceActionLabel: '管理空间显示与共享',
     shared: false,
   },
   {
@@ -157,7 +164,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'shared',
-    spaceActionLabel: '2 个空间已添加、1 个空间已共享',
+    spaceActionLabel: '2 个空间已显示、1 个空间已共享',
     shared: true,
     sharedSpaceIds: [currentSpaceId, 'executives', 'dji-qa', 'llm-test-deepseek'],
   },
@@ -175,7 +182,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'add',
-    spaceActionLabel: '添加空间使用',
+    spaceActionLabel: '管理空间显示与共享',
     shared: false,
   },
   {
@@ -192,7 +199,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'added',
-    spaceActionLabel: '4 个空间已添加',
+    spaceActionLabel: '4 个空间已显示',
     shared: false,
   },
   {
@@ -210,7 +217,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'shared',
-    spaceActionLabel: '2 个空间已添加、1 个空间已共享',
+    spaceActionLabel: '2 个空间已显示、1 个空间已共享',
     shared: true,
     sharedSpaceIds: ['executives', 'llm-test-minimax', 'llm-test-qwen', 'llm-test-glm'],
   },
@@ -228,7 +235,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'add',
-    spaceActionLabel: '添加空间使用',
+    spaceActionLabel: '管理空间显示与共享',
     shared: false,
   },
   {
@@ -245,7 +252,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'added',
-    spaceActionLabel: '4 个空间已添加',
+    spaceActionLabel: '4 个空间已显示',
     shared: false,
   },
   {
@@ -263,7 +270,7 @@ export const createdSkills: CustomSkill[] = [
     uses: 109,
     updatedAt: '2026-06-16 19:07',
     spaceAction: 'shared',
-    spaceActionLabel: '2 个空间已添加、1 个空间已共享',
+    spaceActionLabel: '2 个空间已显示、1 个空间已共享',
     shared: true,
     sharedSpaceIds: [currentSpaceId, 'dji-qa', 'llm-test-kimi-k2.7'],
   },
@@ -271,8 +278,8 @@ export const createdSkills: CustomSkill[] = [
 
 const filterSpaceOptions = [
   { id: 'all', name: '不限空间' },
-  { id: 'agentos-org', name: 'AgentOS 组织' },
   { id: currentSpaceId, name: spaceName },
+  { id: 'agentos-org', name: 'AgentOS 组织' },
   { id: 'executives', name: '高管' },
   { id: 'dji-qa', name: 'DJI-QA' },
   { id: 'llm-test-deepseek', name: 'llm-test-deepseek' },
@@ -334,6 +341,39 @@ export function createSpaceAssignments(skill: CustomSkill): Record<string, Space
   return next
 }
 
+export function createCurrentSpaceOnlyAssignments(): Record<string, SpaceAssignment> {
+  const next = emptySpaceAssignments()
+  next[currentSpaceId] = { added: true, shared: false }
+  return next
+}
+
+function formatSkillTimestamp(date = new Date()) {
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`
+}
+
+export function createUploadedSkill(file: File): CustomSkill {
+  const name = file.name.replace(/\.[^/.]+$/, '').trim() || `skill-${Date.now()}`
+  return {
+    id: `upload-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name,
+    description: skillDescription,
+    tags: [
+      { label: '企业全景规划' },
+      { label: '理需求' },
+      { label: '挖知识' },
+      { label: '生智能' },
+    ],
+    author: 'Siqi Yang',
+    uses: 0,
+    updatedAt: formatSkillTimestamp(),
+    spaceAction: 'added',
+    spaceActionLabel: '1 个空间已显示',
+    shared: false,
+    uploadStatus: 'uploading',
+  }
+}
+
 export function createInitialSkillAssignments() {
   return Object.fromEntries(
     createdSkills.map((skill) => [skill.id, createSpaceAssignments(skill)]),
@@ -349,15 +389,12 @@ function summarizeSpaceAssignments(
   const added = ids.filter((id) => assignments[id]?.added).length
   const shared = allowShare ? ids.filter((id) => assignments[id]?.shared).length : 0
   if (added === 0 && shared === 0) {
-    return { label: '添加空间使用', empty: true }
+    return { label: allowShare ? '管理空间显示与共享' : '管理空间显示', empty: true }
   }
-  if (shared === 0) {
-    return { label: `${added} 个空间已添加`, empty: false }
+  if (!allowShare) {
+    return { label: `${added} 个空间已显示`, empty: false }
   }
-  if (added === 0) {
-    return { label: `${shared} 个空间已共享`, empty: false }
-  }
-  return { label: `${added} 个空间已添加、${shared} 个空间已共享`, empty: false }
+  return { label: `${added} 个空间已显示、${shared} 个空间已共享`, empty: false }
 }
 
 const tagClassName = 'max-w-none min-w-12 text-agentos-sm'
@@ -365,6 +402,18 @@ const moreTagClassName = cn(
   'h-[22px] w-fit min-w-[22px] max-w-none shrink-0 justify-center px-2',
   'overflow-visible [&>span]:min-w-min [&>span]:flex-none [&>span]:overflow-visible [&>span]:whitespace-nowrap',
 )
+const currentSpaceTagClassName =
+  'h-[18px] max-w-none min-w-0 shrink-0 px-agentos-padding-padding-xxs4 text-agentos-sm leading-[16px]'
+const dropdownContentClassName = 'p-1 shadow-[0_4px_10px_rgba(0,0,0,0.1)]'
+const dropdownItemClassName = 'rounded-agentos-rounded-md6 [&_svg]:size-[14px]'
+
+function CurrentSpaceTag() {
+  return (
+    <Tag size="sm" shape="rectangle" color="default" className={currentSpaceTagClassName}>
+      当前空间
+    </Tag>
+  )
+}
 
 function SkillTag({ label, tone = 'category' }: SkillTag) {
   if (tone === 'official') {
@@ -518,6 +567,42 @@ function OfficialSkillCard({ skill }: { skill: OfficialSkill }) {
   )
 }
 
+function SpaceStatusButton({
+  active,
+  activeLabel,
+  inactiveLabel,
+  ariaLabel,
+  onClick,
+  icon: Icon,
+}: {
+  active: boolean
+  activeLabel: string
+  inactiveLabel: string
+  ariaLabel: string
+  onClick: () => void
+  icon: typeof Eye
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={ariaLabel}
+      aria-pressed={active}
+      onClick={onClick}
+      className={cn(
+        'inline-flex h-6 shrink-0 items-center gap-0.5 whitespace-nowrap rounded-agentos-rounded-sm4',
+        'px-agentos-padding-padding6 text-agentos-sm leading-[16px]',
+        'hover:bg-agentos-neutral-fill-color-fill-secondary',
+        active
+          ? 'text-agentos-brand-success-color-success-active'
+          : 'text-agentos-neutral-text-color-text-quaternary',
+      )}
+    >
+      <Icon aria-hidden="true" className="size-[14px]" />
+      {active ? activeLabel : inactiveLabel}
+    </button>
+  )
+}
+
 function SkillSpaceMenu({
   allowShare,
   spaces,
@@ -531,19 +616,6 @@ function SkillSpaceMenu({
 }) {
   const spaceIds = spaces.map((space) => space.id)
   const summary = summarizeSpaceAssignments(assignments, allowShare, spaceIds)
-  const addedCount = spaceIds.filter((id) => assignments[id]?.added).length
-  const allChecked: CheckboxState =
-    addedCount === 0 ? false : addedCount === spaces.length ? true : 'indeterminate'
-
-  const setAllAdded = (added: boolean) => {
-    onAssignmentsChange((current) => {
-      const next = { ...current }
-      for (const space of spaces) {
-        next[space.id] = { added, shared: current[space.id]?.shared ?? false }
-      }
-      return next
-    })
-  }
 
   const setSpaceAdded = (id: string, added: boolean) => {
     onAssignmentsChange((current) => ({
@@ -583,272 +655,134 @@ function SkillSpaceMenu({
         placement="bottomLeft"
         showArrow={false}
         sideOffset={4}
-        width={280}
-        style={{ maxWidth: 280 }}
+        width="var(--radix-popover-trigger-width)"
+        style={{ maxWidth: 'var(--radix-popover-trigger-width)', maxHeight: 280 }}
         className={cn(
-          'pointer-events-auto z-[1300] w-[280px] max-w-[280px] gap-0 overflow-hidden',
+          'pointer-events-auto z-[1300] max-h-[280px] w-[var(--radix-popover-trigger-width)] max-w-[var(--radix-popover-trigger-width)] gap-0 overflow-hidden',
           'border border-agentos-neutral-border-color-border bg-agentos-neutral-bg-color-bg-container p-1',
           'shadow-[0_4px_10px_rgba(0,0,0,0.1)]',
         )}
       >
-        <div className="composer-scrollview flex max-h-[288px] w-full flex-col overflow-y-auto">
-          <div className="flex h-[36px] min-h-[36px] w-full items-center rounded-agentos-rounded-lg8 px-2 py-[7px] hover:bg-agentos-neutral-fill-color-fill-tertiary">
-            <Checkbox
-              checked={allChecked}
-              label="添加所有空间"
-              className="w-full"
-              onCheckedChange={(checked) => setAllAdded(checked === true)}
-            />
-          </div>
+        <div className="composer-scrollview flex min-h-0 w-full flex-1 flex-col overflow-y-auto">
           {spaces.map((space) => {
             const assignment = assignments[space.id] ?? { added: false, shared: false }
             return (
               <div
                 key={space.id}
-                className="group flex h-[36px] min-h-[36px] w-full items-center gap-agentos-gap-gap-xs8 rounded-agentos-rounded-lg8 px-2 py-[7px] hover:bg-agentos-neutral-fill-color-fill-tertiary"
+                className="flex h-[36px] min-h-[36px] w-full items-center gap-agentos-gap-gap-xs8 rounded-agentos-rounded-lg8 px-2 py-[7px] hover:bg-agentos-neutral-fill-color-fill-tertiary"
               >
-                <Checkbox
-                  checked={assignment.added}
-                  label={space.name}
-                  className="min-w-0 flex-1 overflow-hidden [&>span:last-child]:min-w-0 [&>span:last-child]:truncate"
-                  onCheckedChange={(checked) => setSpaceAdded(space.id, checked === true)}
-                />
-                {allowShare ? (
-                  <div
-                    className={cn(
-                      'flex shrink-0 items-center gap-agentos-gap-gap-xxs4 transition-none duration-0',
-                      assignment.shared
-                        ? 'visible opacity-100'
-                        : 'invisible opacity-0 group-hover:visible group-hover:opacity-100',
-                    )}
-                  >
-                    <span className="whitespace-nowrap text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text">
-                      共享
-                    </span>
-                    <Switch
-                      size="sm"
-                      checked={assignment.shared}
-                      aria-label={`共享到${space.name}`}
-                      onCheckedChange={(shared) => setSpaceShared(space.id, shared)}
+                <span className="flex min-w-0 flex-1 items-center gap-agentos-gap-gap-xxs4">
+                  <span className="min-w-0 truncate text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text">
+                    {space.name}
+                  </span>
+                  {space.id === currentSpaceId ? <CurrentSpaceTag /> : null}
+                </span>
+                <div className="flex shrink-0 items-center gap-agentos-gap-gap-xs8">
+                  <SpaceStatusButton
+                    active={assignment.added}
+                    activeLabel="显示"
+                    inactiveLabel="隐藏"
+                    ariaLabel={`${assignment.added ? '隐藏' : '显示'}${space.name}`}
+                    icon={assignment.added ? Eye : EyeOff}
+                    onClick={() => setSpaceAdded(space.id, !assignment.added)}
+                  />
+                  {allowShare ? (
+                    <SpaceStatusButton
+                      active={assignment.shared}
+                      activeLabel="共享"
+                      inactiveLabel="私有"
+                      ariaLabel={`${assignment.shared ? '取消共享' : '共享到'}${space.name}`}
+                      icon={assignment.shared ? LockOpen : Lock}
+                      onClick={() => setSpaceShared(space.id, !assignment.shared)}
                     />
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
             )
           })}
-        </div>
-        <div className="w-full px-agentos-padding-padding-xs8 py-agentos-padding-padding-xxs4">
-          <Divider className="bg-agentos-neutral-border-color-split" />
-        </div>
-        <div className="px-2 py-[7px] pr-1 text-agentos-sm font-agentos-normal leading-[16px] text-agentos-neutral-text-color-text-quaternary whitespace-normal">
-          <p>添加到对应空间后可通过 slash 调用</p>
-          {allowShare ? <p>共享至对应空间后可被他人添加使用</p> : null}
         </div>
       </PopoverContent>
     </Popover>
   )
 }
 
-function ScopedActionButton({
-  done,
-  disabled = false,
-  idleLabel,
-  doneLabel,
-  cancelLabel,
-  idleIcon,
-  tone = 'primary',
-  className,
-  onClick,
+function SkillMoreMenu({
+  skillName,
+  onReupload,
+  onDelete,
 }: {
-  done: boolean
-  disabled?: boolean
-  idleLabel: string
-  doneLabel: string
-  cancelLabel: string
-  idleIcon: 'plus' | 'lock' | 'none'
-  tone?: 'primary' | 'neutral'
-  className?: string
-  onClick: () => void
+  skillName: string
+  onReupload: () => void
+  onDelete: () => void
 }) {
-  const IdleIcon = idleIcon === 'plus' ? Plus : idleIcon === 'lock' ? Lock : null
-  const [hovered, setHovered] = useState(false)
-  const ignoreHoverUntilLeave = useRef(false)
-  const showCancel = done && hovered && !disabled
-
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onPointerEnter={() => {
-        if (ignoreHoverUntilLeave.current) return
-        setHovered(true)
-      }}
-      onPointerLeave={() => {
-        ignoreHoverUntilLeave.current = false
-        setHovered(false)
-      }}
-      onClick={() => {
-        onClick()
-        ignoreHoverUntilLeave.current = true
-        setHovered(false)
-      }}
-      className={cn(
-        'flex h-8 min-h-8 w-full shrink-0 items-center justify-center gap-1 rounded-agentos-rounded-lg8',
-        'text-agentos-sm leading-[16px] transition-colors',
-        disabled &&
-          'cursor-not-allowed border border-dashed border-agentos-neutral-border-color-border text-agentos-neutral-text-color-text-disabled',
-        !disabled &&
-          !done &&
-          (tone === 'primary'
-            ? 'border border-dashed border-agentos-brand-primary-color-primary text-agentos-brand-primary-color-primary'
-            : 'border border-dashed border-agentos-neutral-border-color-border text-agentos-neutral-text-color-text-secondary'),
-        !disabled &&
-          done &&
-          !showCancel &&
-          'bg-agentos-neutral-fill-color-fill-secondary text-agentos-neutral-text-color-text-secondary',
-        !disabled &&
-          showCancel &&
-          'bg-agentos-brand-error-color-error-bg text-agentos-brand-error-color-error',
-        className,
-      )}
-    >
-      {showCancel ? (
-        <>
-          <X aria-hidden="true" className="size-3.5" />
-          {cancelLabel}
-        </>
-      ) : done ? (
-        <>
-          <Check aria-hidden="true" className="size-3.5" />
-          {doneLabel}
-        </>
-      ) : (
-        <>
-          {IdleIcon ? <IdleIcon aria-hidden="true" className="size-3.5" /> : null}
-          {idleLabel}
-        </>
-      )}
-    </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          theme="black"
+          appearance="ghost"
+          size="icon"
+          shape="rectangle"
+          aria-label={`${skillName} 更多操作`}
+          className="size-6 shrink-0 [&_svg]:size-3"
+        >
+          <Ellipsis aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        className={cn('z-[1400] min-w-[132px]', dropdownContentClassName)}
+      >
+        <DropdownMenuItem className={dropdownItemClassName}>
+          <Pencil aria-hidden="true" />
+          编辑技能
+        </DropdownMenuItem>
+        <DropdownMenuItem className={dropdownItemClassName} onSelect={onReupload}>
+          <RefreshCw aria-hidden="true" />
+          重新上传
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          className={cn(
+            dropdownItemClassName,
+            'text-agentos-brand-error-color-error focus:text-agentos-brand-error-color-error data-[highlighted]:text-agentos-brand-error-color-error',
+          )}
+          onSelect={onDelete}
+        >
+          <Trash2 aria-hidden="true" />
+          删除技能
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
-}
-
-function SpaceScopedActions({
-  allowShare,
-  added,
-  shared,
-  onToggleAdded,
-  onToggleShared,
-}: {
-  allowShare: boolean
-  added: boolean
-  shared: boolean
-  onToggleAdded: () => void
-  onToggleShared: () => void
-}) {
-  if (!allowShare) {
-    return (
-      <ScopedActionButton
-        done={added}
-        idleLabel="添加至空间"
-        doneLabel="已添加"
-        cancelLabel="取消添加"
-        idleIcon="plus"
-        tone="neutral"
-        onClick={onToggleAdded}
-      />
-    )
-  }
-
-  return (
-    <div className="flex w-full items-center gap-agentos-gap-gap-xs8">
-      <ScopedActionButton
-        done={added}
-        idleLabel="添加至空间"
-        doneLabel="已添加"
-        cancelLabel="取消添加"
-        idleIcon="plus"
-        tone="neutral"
-        className="w-auto min-w-0 flex-1"
-        onClick={onToggleAdded}
-      />
-      <ScopedActionButton
-        done={shared}
-        idleLabel="在空间共享"
-        doneLabel="已共享"
-        cancelLabel="取消共享"
-        idleIcon="none"
-        tone="neutral"
-        className="w-auto min-w-0 flex-1"
-        onClick={onToggleShared}
-      />
-    </div>
-  )
-}
-
-function resolveFilteredTags({
-  skill,
-  allowShare,
-  sharedInSpace,
-}: {
-  skill: CustomSkill
-  allowShare: boolean
-  sharedInSpace: boolean
-}): SkillTag[] {
-  const withoutShare = skill.tags.filter((tag) => tag.tone !== 'shared')
-  if (!allowShare || sharedInSpace) {
-    return [{ label: '共享', tone: 'shared' }, ...withoutShare]
-  }
-  return withoutShare
 }
 
 function CustomSkillCard({
   skill,
   allowShare,
-  filteredSpaceId,
   assignments,
   onAssignmentsChange,
+  onReupload,
+  onDelete,
 }: {
   skill: CustomSkill
   allowShare: boolean
-  filteredSpaceId: string | null
   assignments: Record<string, SpaceAssignment>
   onAssignmentsChange: Dispatch<SetStateAction<Record<string, SpaceAssignment>>>
+  onReupload: () => void
+  onDelete: () => void
 }) {
   const menuSpaces = getSkillMenuSpaces(skill, allowShare)
-  const scoped = filteredSpaceId
-    ? (assignments[filteredSpaceId] ?? { added: false, shared: false })
-    : null
-  const tags =
-    scoped == null
-      ? skill.tags
-      : resolveFilteredTags({
-          skill,
-          allowShare,
-          sharedInSpace: scoped.shared,
-        })
 
-  const toggleAdded = () => {
-    if (!filteredSpaceId) return
-    onAssignmentsChange((current) => {
-      const previous = current[filteredSpaceId] ?? { added: false, shared: false }
-      const added = !previous.added
-      return {
-        ...current,
-        [filteredSpaceId]: { added, shared: previous.shared },
-      }
-    })
-  }
-
-  const toggleShared = () => {
-    if (!filteredSpaceId) return
-    onAssignmentsChange((current) => {
-      const previous = current[filteredSpaceId] ?? { added: false, shared: false }
-      const shared = !previous.shared
-      return {
-        ...current,
-        [filteredSpaceId]: { added: previous.added, shared },
-      }
-    })
+  if (skill.uploadStatus === 'uploading') {
+    return (
+      <div className="flex h-full min-w-0 items-center justify-center overflow-hidden rounded-agentos-rounded-lg8 border border-agentos-neutral-border-color-border bg-agentos-neutral-bg-color-bg-container">
+        <div className="inline-flex items-center gap-agentos-gap-gap-xxs4 text-agentos-md leading-agentos-18 text-agentos-neutral-text-color-text-tertiary">
+          <LoaderCircle aria-hidden="true" className="size-4 shrink-0 animate-spin" />
+          上传中
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -859,23 +793,17 @@ function CustomSkillCard({
             {skill.name}
           </p>
           {allowShare ? (
-            <Button
-              type="button"
-              theme="black"
-              appearance="ghost"
-              size="icon"
-              shape="rectangle"
-              aria-label={`${skill.name} 更多操作`}
-              className="size-6 shrink-0 [&_svg]:size-3"
-            >
-              <Ellipsis aria-hidden="true" />
-            </Button>
+            <SkillMoreMenu
+              skillName={skill.name}
+              onReupload={onReupload}
+              onDelete={onDelete}
+            />
           ) : null}
         </div>
         <p className="truncate text-agentos-sm leading-[16px] text-agentos-neutral-text-color-text-secondary">
           {skill.description}
         </p>
-        <OneLineSkillTags tags={tags} />
+        <OneLineSkillTags tags={skill.tags} />
       </div>
       <div className="flex items-center gap-agentos-gap-gap-sm12 text-agentos-sm leading-[16px] text-agentos-neutral-text-color-text-tertiary">
         <span className="inline-flex items-center gap-1">
@@ -891,22 +819,12 @@ function CustomSkillCard({
           {skill.updatedAt}
         </span>
       </div>
-      {scoped ? (
-        <SpaceScopedActions
-          allowShare={allowShare}
-          added={scoped.added}
-          shared={scoped.shared}
-          onToggleAdded={toggleAdded}
-          onToggleShared={toggleShared}
-        />
-      ) : (
-        <SkillSpaceMenu
-          allowShare={allowShare}
-          spaces={menuSpaces}
-          assignments={assignments}
-          onAssignmentsChange={onAssignmentsChange}
-        />
-      )}
+      <SkillSpaceMenu
+        allowShare={allowShare}
+        spaces={menuSpaces}
+        assignments={assignments}
+        onAssignmentsChange={onAssignmentsChange}
+      />
     </div>
   )
 }
@@ -974,7 +892,10 @@ function SpaceFilterSelect({
                   setOpen(false)
                 }}
               >
-                <span className="min-w-0 flex-1 truncate">{space.name}</span>
+                <span className="flex min-w-0 flex-1 items-center gap-agentos-gap-gap-xxs4">
+                  <span className="min-w-0 truncate">{space.name}</span>
+                  {space.id === currentSpaceId ? <CurrentSpaceTag /> : null}
+                </span>
                 {isSelected ? (
                   <Check
                     aria-hidden="true"
@@ -985,12 +906,6 @@ function SpaceFilterSelect({
             )
           })}
         </div>
-        <div className="w-full shrink-0 px-agentos-padding-padding-xs8 py-agentos-padding-padding-xxs4">
-          <Divider className="bg-agentos-neutral-border-color-split" />
-        </div>
-        <div className="shrink-0 px-2 py-[7px] pr-1 text-agentos-sm font-agentos-normal leading-[16px] text-agentos-neutral-text-color-text-quaternary">
-          筛选后技能将仅添加或共享至所选空间
-        </div>
       </PopoverContent>
     </Popover>
   )
@@ -1000,27 +915,43 @@ export function ManageSkillsModal({
   open,
   initialSpace = 'all',
   skillAssignments,
+  extraSkills = [],
+  hiddenSkillIds = [],
   onSkillAssignmentsChange,
   onOpenChange,
   onCreateSkill,
+  onUploadSkill,
+  onReuploadSkill,
+  onDeleteSkill,
 }: {
   open: boolean
   initialSpace?: string
   skillAssignments: Record<string, Record<string, SpaceAssignment>>
+  extraSkills?: CustomSkill[]
+  hiddenSkillIds?: string[]
   onSkillAssignmentsChange: (
     skillId: string,
     updater: SetStateAction<Record<string, SpaceAssignment>>,
   ) => void
   onOpenChange: (open: boolean) => void
   onCreateSkill: () => void
+  onUploadSkill: (file: File) => void
+  onReuploadSkill: (skillId: string, file: File) => void
+  onDeleteSkill: (skillId: string) => void
 }) {
   const [expanded, setExpanded] = useState(false)
   const [tab, setTab] = useState<'created' | 'shared'>('created')
   const [space, setSpace] = useState(initialSpace)
+  const [skillToDelete, setSkillToDelete] = useState<string | null>(null)
+  const uploadInputRef = useRef<HTMLInputElement | null>(null)
+  const reuploadSkillIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (open) {
       setSpace(initialSpace)
+      if (initialSpace !== 'all') {
+        setTab('shared')
+      }
     }
   }, [open, initialSpace])
 
@@ -1031,14 +962,22 @@ export function ManageSkillsModal({
   const filteredSpaceId = space === 'all' ? null : space
 
   const customSkills = useMemo(() => {
-    const list = tab === 'shared' ? createdSkills.filter((skill) => skill.shared) : createdSkills
+    const hidden = new Set(hiddenSkillIds)
+    const extraIds = new Set(extraSkills.map((skill) => skill.id))
+    const created = createdSkills.filter(
+      (skill) => !hidden.has(skill.id) && !extraIds.has(skill.id),
+    )
+    const extras = extraSkills.filter((skill) => !hidden.has(skill.id))
+    const list =
+      tab === 'shared' ? created.filter((skill) => skill.shared) : [...extras, ...created]
     if (tab !== 'shared' || !filteredSpaceId) {
       return list
     }
     return list.filter((skill) => skill.sharedSpaceIds?.includes(filteredSpaceId))
-  }, [tab, filteredSpaceId])
+  }, [tab, filteredSpaceId, extraSkills, hiddenSkillIds])
 
   return (
+    <>
     <Modal open={open} onOpenChange={onOpenChange}>
       <ModalContent
         className="h-[min(760px,calc(100dvh-80px))] w-[min(1000px,calc(100vw-48px))] gap-4 rounded-agentos-rounded2-xl16 bg-agentos-neutral-bg-color-bg-container px-5 py-4 duration-0 data-[state=open]:!animate-none data-[state=closed]:!animate-none"
@@ -1101,42 +1040,87 @@ export function ManageSkillsModal({
                   他人共享的
                 </button>
               </div>
-              <div className="w-[160px] shrink-0">
-                <SpaceFilterSelect value={space} onValueChange={setSpace} />
-              </div>
+              {tab === 'shared' ? (
+                <div className="w-[160px] shrink-0">
+                  <SpaceFilterSelect value={space} onValueChange={setSpace} />
+                </div>
+              ) : null}
               <Button
                 type="button"
                 theme="black"
-                appearance="solid"
+                appearance="outline"
                 size="default"
                 shape="rectangle"
-                leadingIcon={<MessageCircleMore aria-hidden="true" />}
-                onClick={onCreateSkill}
               >
-                创建技能
+                下载技能模板
               </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    theme="black"
+                    appearance="solid"
+                    size="default"
+                    shape="rectangle"
+                    trailingIcon={<ChevronDown aria-hidden="true" />}
+                  >
+                    新建技能
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className={cn('z-[1300] min-w-[132px]', dropdownContentClassName)}
+                >
+                  <DropdownMenuItem
+                    className={dropdownItemClassName}
+                    onSelect={onCreateSkill}
+                  >
+                    <MessageCircleMore aria-hidden="true" />
+                    创建技能
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className={dropdownItemClassName}
+                    onSelect={() => uploadInputRef.current?.click()}
+                  >
+                    <Upload aria-hidden="true" />
+                    上传技能
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <input
+                ref={uploadInputRef}
+                type="file"
+                className="hidden"
+                onChange={(event) => {
+                  const file = event.target.files?.[0]
+                  event.target.value = ''
+                  if (!file) {
+                    return
+                  }
+                  setTab('created')
+                  const reuploadId = reuploadSkillIdRef.current
+                  reuploadSkillIdRef.current = null
+                  if (reuploadId) {
+                    onReuploadSkill(reuploadId, file)
+                    return
+                  }
+                  onUploadSkill(file)
+                }}
+              />
             </div>
             <div className="grid grid-cols-2 items-stretch gap-3 min-[960px]:grid-cols-3">
-              {tab === 'created' ? (
-                <div className="min-h-0">
-                  <UploadTrigger
-                    variant="drag"
-                    className="h-full min-h-0 bg-agentos-neutral-bg-color-bg-container py-0"
-                    title="点击或拖拽文件到此处上传技能"
-                    description={
-                      <span className="text-agentos-brand-primary-color-primary">下载技能模板</span>
-                    }
-                  />
-                </div>
-              ) : null}
               {customSkills.map((skill) => (
                 <CustomSkillCard
                   key={skill.id}
                   skill={tab === 'shared' ? { ...skill, author: 'Mark Lee' } : skill}
                   allowShare={tab === 'created'}
-                  filteredSpaceId={filteredSpaceId}
                   assignments={skillAssignments[skill.id] ?? createSpaceAssignments(skill)}
                   onAssignmentsChange={(updater) => onSkillAssignmentsChange(skill.id, updater)}
+                  onReupload={() => {
+                    reuploadSkillIdRef.current = skill.id
+                    uploadInputRef.current?.click()
+                  }}
+                  onDelete={() => setSkillToDelete(skill.id)}
                 />
               ))}
             </div>
@@ -1144,5 +1128,27 @@ export function ManageSkillsModal({
         </ModalBody>
       </ModalContent>
     </Modal>
+    <InformationModal
+      open={skillToDelete != null}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) {
+          setSkillToDelete(null)
+        }
+      }}
+      semantic="warning"
+      title="是否删除该技能"
+      description="删除后，将无法在所有空间内使用"
+      closeLabel={closeLabel}
+      cancelLabel={cancelLabel}
+      confirmLabel={deleteLabel}
+      contentClassName="z-[1400] duration-0 data-[state=open]:!animate-none data-[state=closed]:!animate-none"
+      onConfirm={() => {
+        if (skillToDelete) {
+          onDeleteSkill(skillToDelete)
+        }
+        setSkillToDelete(null)
+      }}
+    />
+  </>
   )
 }
